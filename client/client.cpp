@@ -1,6 +1,6 @@
 #include <iostream>
 #include <iomanip>
-#include "../server/interfaces.h"
+#include "interfaces.h"
 
 using namespace std;
 
@@ -13,7 +13,7 @@ int main () {
     double* det = new double();
 
     IMatrix *M = NULL;
-    HRESULT_ res = CreateInstance(IID_IMatrix, (void**) &M);
+    HRESULT_ res = CreateInstance(CLSID_MATRIX, IID_IMatrix, (void**) &M);
     if (res == S_OK_) {
         cout << "IMATRIX CREATE SUCCESS" << endl;
         res = M->DetMatrix(test, det, n);

@@ -3,6 +3,7 @@ g++ -c .\server\server.cpp -o .\server\server.o
 
 move /Y .\server\server.o .\client
 move /Y .\server\interfaces.o .\client
+xcopy .\server\interfaces.h .\client /Y
 
 g++ -c ./client/client.cpp  -o ./client/client.o
 
