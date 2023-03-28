@@ -3,6 +3,12 @@
         "iostream": "cpp",
         "ostream": "cpp",
         "iomanip": "cpp",
-        "new": "cpp"
+        "new": "cpp",
+        "bit": "cpp",
+        "*.tcc": "cpp",
+        "functional": "cpp",
+        "random": "cpp",
+        "limits": "cpp",
+        "type_traits": "cpp"
     }
 }

@@ -9,6 +9,8 @@ using ULONG_ = int;
 const int IID_IUnknown_ = 0;
 const int IID_IMatrix = 1;
 const int IID_IMatrixA = 2;
+const int IID_IFactory = 100;
+//const int IID_IAFactory = 101;
 
 
 const int S_OK_ = 0;
@@ -18,13 +20,16 @@ const int E_OUTOFMEMORY_ = 3;
 const int E_DET0_ = 4;
 
 const int CLSID_MATRIX = 1;
+const int CLSID_Factory = 1;
+const int CLSID_MATRIXA = 2;
+const int CLSID_FactoryA = 2;
 
 class IUnknown_ {
         public:	
                 virtual HRESULT_ __stdcall QueryInterface(const IID_& iid, void** ppv)=0;
                 virtual ULONG_ __stdcall AddRef()=0;
                 virtual ULONG_ __stdcall Release()=0;
-}; 
+};
 
 class IMatrix: public IUnknown_ {
         public:
@@ -43,7 +48,18 @@ class IMatrixA: public IUnknown_ {
                 virtual HRESULT_ __stdcall InverseMatrix(double *a, double *b, int n) = 0;
 };
 
+class IFactory: public IUnknown_ {
+        public:
+                virtual HRESULT_ __stdcall CreateInstance(const IID_& iid, void** ppv) = 0;
+};
 
+/*class IFactoryA: public IUnknown_ {
+        public:
+                virtual HRESULT_ __stdcall GetClassObject(const IID_& iid, void** ppv) = 0;
+                virtual HRESULT_ __stdcall GetClassObject(const IID_& iid, void** ppv, HRESULT_ x) = 0;
+};*/
+
+HRESULT_ __stdcall GetClassObject(const CLSID_& clsid, const IID_& iid, void** ppv);
 HRESULT_ __stdcall CreateInstance(const CLSID_& clsid, const IID_& iid, void** ppv);
 
 #endif
