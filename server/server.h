@@ -45,7 +45,7 @@ class MatrixA: public IMatrix, IMatrixA {
         
 };
 
-class Factory: public IFactory {
+class Factory: public IFactory, IFactoryA {
 	private:
 		int fRefCount;
 	public:
@@ -54,9 +54,10 @@ class Factory: public IFactory {
 	    virtual ULONG_ __stdcall Release();
 
 		virtual HRESULT_ __stdcall CreateInstance(const IID_& iid, void** ppv);
+		virtual HRESULT_ __stdcall CreateInstanceA(const IID_& iid, void** ppv);
 };
 
-class FactoryA: public IFactory {
+class FactoryA: public IFactory, IFactoryA {
 	private:
 		int fRefCount;
 	public:
@@ -65,6 +66,7 @@ class FactoryA: public IFactory {
 	    virtual ULONG_ __stdcall Release();
 
 		virtual HRESULT_ __stdcall CreateInstance(const IID_& iid, void** ppv);
+		virtual HRESULT_ __stdcall CreateInstanceA(const IID_& iid, void** ppv);
 };
 
 #endif // SERVER_H_INCLUDED

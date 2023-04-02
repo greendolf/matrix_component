@@ -10,7 +10,7 @@ const int IID_IUnknown_ = 0;
 const int IID_IMatrix = 1;
 const int IID_IMatrixA = 2;
 const int IID_IFactory = 100;
-//const int IID_IAFactory = 101;
+const int IID_IFactoryA = 101;
 
 
 const int S_OK_ = 0;
@@ -53,11 +53,10 @@ class IFactory: public IUnknown_ {
                 virtual HRESULT_ __stdcall CreateInstance(const IID_& iid, void** ppv) = 0;
 };
 
-/*class IFactoryA: public IUnknown_ {
+class IFactoryA: public IUnknown_ {
         public:
-                virtual HRESULT_ __stdcall GetClassObject(const IID_& iid, void** ppv) = 0;
-                virtual HRESULT_ __stdcall GetClassObject(const IID_& iid, void** ppv, HRESULT_ x) = 0;
-};*/
+                virtual HRESULT_ __stdcall CreateInstanceA(const IID_& iid, void** ppv) = 0;
+};
 
 HRESULT_ __stdcall GetClassObject(const CLSID_& clsid, const IID_& iid, void** ppv);
 HRESULT_ __stdcall CreateInstance(const CLSID_& clsid, const IID_& iid, void** ppv);

@@ -26,9 +26,9 @@ HRESULT_ __stdcall GetClassObject(const CLSID_& clsid, const IID_& iid, void** p
     IUnknown_ *obj = NULL;
     if (clsid == CLSID_Factory) {
         obj = (IUnknown_*)(IFactory*) new Factory();
-    } /* else if (clsid == CLSID_FactoryA) {
-        obj = (IUnknown_*)(IAFactory*) new AFactory;
-    }*/else if (obj == NULL) {
+    } else if (clsid == CLSID_FactoryA) {
+        obj = (IUnknown_*)(IFactoryA*) new FactoryA();
+    } else if (obj == NULL) {
         return E_NOCOMPONENT_;
     }
     return obj->QueryInterface(iid, ppv);

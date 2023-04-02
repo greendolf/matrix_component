@@ -296,13 +296,11 @@ HRESULT_ __stdcall Factory::QueryInterface(const IID_& iid, void** ppv) {
 
     if (iid == IID_IUnknown_) {
         *ppv = (IUnknown_*)(IFactory*)this;
-    }
-    else if (iid == IID_IFactory) {
+    } else if (iid == IID_IFactory) {
         *ppv = static_cast<IFactory*>(this);
-    } /*else if (iid == IID_IFactoryA) {
+    } else if (iid == IID_IFactoryA) {
         *ppv = static_cast<IFactoryA*>(this);
-    }*/
-    else {
+    } else {
         *ppv = NULL;
         return E_NOINTERFACE_;
     }
@@ -339,19 +337,26 @@ HRESULT_ __stdcall Factory::CreateInstance(const IID_& iid, void** ppv) {
     return obj->QueryInterface(iid, ppv);
 }
 
+HRESULT_ __stdcall Factory::CreateInstanceA(const IID_& iid, void** ppv) {
+    cout << "Factory::CreateInstance:" << ":" << iid << endl;
+    IUnknown_ *obj = NULL;
+    obj = (IUnknown_*)(IMatrix*) new Matrix();
+    if (obj == NULL) {
+        return E_OUTOFMEMORY_;
+    }
+    return obj->QueryInterface(iid, ppv);
+}
+
 HRESULT_ __stdcall FactoryA::QueryInterface(const IID_& iid, void** ppv) {
     cout << "Matrix::QueryInterface:" << iid << endl;
 
     if (iid == IID_IUnknown_) {
         *ppv = (IUnknown_*)(IFactory*)this;
-    }
-    else if (iid == IID_IFactory) {
+    } else if (iid == IID_IFactory) {
         *ppv = static_cast<IFactory*>(this);
-    }
-    /*else if (iid == IID_IFactoryA) {
+    } else if (iid == IID_IFactoryA) {
         *ppv = static_cast<IFactoryA*>(this);
-    }*/
-    else {
+    } else {
         *ppv = NULL;
         return E_NOINTERFACE_;
     }
@@ -379,6 +384,13 @@ ULONG_ __stdcall FactoryA::Release() {
 }
 
 HRESULT_ __stdcall FactoryA::CreateInstance(const IID_& iid, void** ppv) {
+    cout << "FactoryA::CreateInstance:" << ":" << iid << endl;
+    IUnknown_ *obj = NULL;
+    obj = (IUnknown_*)(IMatrix*) new Matrix();
+    return obj->QueryInterface(iid, ppv);
+}
+
+HRESULT_ __stdcall FactoryA::CreateInstanceA(const IID_& iid, void** ppv) {
     cout << "FactoryA::CreateInstance:" << ":" << iid << endl;
     IUnknown_ *obj = NULL;
     obj = (IUnknown_*)(IMatrix*) new Matrix();

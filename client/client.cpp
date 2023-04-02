@@ -53,7 +53,7 @@ int main () {
     cout << "\nend." << endl << endl;
 
     IFactory *IF = NULL;
-    res = GetClassObject(CLSID_Factory, IID_IFactory, (void**) &IF);
+    res = GetClassObject(CLSID_Factory, IID_IFactoryA, (void**) &IF);
     if (res == S_OK_) {
         cout << "GetClassObject Success" << endl;
         IMatrix *IMA = NULL;
