@@ -1,6 +1,6 @@
 #include "server.h"
-
 #include <iostream>
+
 using namespace std;
 
 Matrix::Matrix() {
@@ -14,17 +14,17 @@ Matrix::~Matrix() {
 
 HRESULT_ __stdcall Matrix::QueryInterface(const IID_& iid, void** ppv) {
     cout << "Matrix::QueryInterface:" << iid << endl;
+    
 
     if (iid == IID_IUnknown_) {
         *ppv = (IUnknown_*)(IMatrix*)this;
-    }
-    else if (iid == IID_IMatrix) {
+    } else if (iid == IID_IMatrix) {
         *ppv = static_cast<IMatrix*>(this);
-    }
-    else {
+    } else {
         *ppv = NULL;
         return E_NOINTERFACE_;
     }
+
     this->AddRef();
     return S_OK_;
 }
@@ -348,7 +348,7 @@ HRESULT_ __stdcall Factory::CreateInstanceA(const IID_& iid, void** ppv) {
 }
 
 HRESULT_ __stdcall FactoryA::QueryInterface(const IID_& iid, void** ppv) {
-    cout << "Matrix::QueryInterface:" << iid << endl;
+    cout << "FactoryA::QueryInterface:" << iid << endl;
 
     if (iid == IID_IUnknown_) {
         *ppv = (IUnknown_*)(IFactory*)this;
@@ -386,13 +386,13 @@ ULONG_ __stdcall FactoryA::Release() {
 HRESULT_ __stdcall FactoryA::CreateInstance(const IID_& iid, void** ppv) {
     cout << "FactoryA::CreateInstance:" << ":" << iid << endl;
     IUnknown_ *obj = NULL;
-    obj = (IUnknown_*)(IMatrix*) new Matrix();
+    obj = (IUnknown_*)(IMatrix*) new MatrixA();
     return obj->QueryInterface(iid, ppv);
 }
 
 HRESULT_ __stdcall FactoryA::CreateInstanceA(const IID_& iid, void** ppv) {
     cout << "FactoryA::CreateInstance:" << ":" << iid << endl;
     IUnknown_ *obj = NULL;
-    obj = (IUnknown_*)(IMatrix*) new Matrix();
+    obj = (IUnknown_*)(IMatrix*) new MatrixA();
     return obj->QueryInterface(iid, ppv);
 }

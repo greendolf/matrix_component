@@ -70,6 +70,8 @@ int main () {
             }
         }
     }
+    IF->Release();
+    
     cin.get();
     return 0;
 }
