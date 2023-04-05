@@ -33,66 +33,6 @@ int main () {
             cout << endl << "Trans M: " << endl;
             show(test2, n, n);
         }
-    /*
-    IMatrix *M = NULL;
-    HRESULT_ res = CreateInstance(CLSID_MATRIXA, IID_IMatrix, (void**) &M);
-    
-    if (res == S_OK_) {
-        cout << "IMATRIX CREATE SUCCESS" << endl;
-        double* det = new double();
-        res = M->DetMatrix(test, det, n);
-        if (res == S_OK_) { cout << "Det M = " << *det << endl; }
-        res = -1;
-    }
-
-    IMatrixA *MA = NULL;
-    res = M->QueryInterface(IID_IMatrixA, (void**) &MA);
-
-    if (res == S_OK_) {
-        cout << "IMATRIXA QI SUCCESS" << endl;
-        double* test2 = new double[n*n];
-        res = MA->InverseMatrix(test, test2, n);
-
-        if (res == S_OK_) {
-            cout << endl << "M:" << endl;
-            show(test, n, n);
-            cout << "\nInv M:" << endl;
-            show(test2, n, n);
-        }
-
-        res = MA->TransMatrix(test, test2, n);
-        if (res == S_OK_) {
-            cout << endl << "Trans M: " << endl;
-            show(test2, n, n);
-        }
-    }
-
-    cout << endl;
-    
-    M->Release();
-    MA->Release();
-    cout << "\nend." << endl << endl;
-
-    IFactory *IF = NULL;
-    res = GetClassObject(CLSID_Factory, IID_IFactoryA, (void**) &IF);
-    if (res == S_OK_) {
-        cout << "GetClassObject Success" << endl;
-        IMatrix *IMA = NULL;
-        res = IF -> CreateInstance(1, (void**) &IMA);
-        if (res == S_OK_) {
-            cout << "IBF::CreateInstance Success" << endl;
-            double* test4 = new double[n * n];
-            res = IMA->AddMatrixNum(test, 5, test4, 3, 3);
-            if (res == S_OK_) {
-                cout << "Matrix:" << endl;
-                show(test, n, n);
-                cout << "AddMatrixNum 5 res:" << endl;
-                show(test4, n, n);
-            }
-        }
-    }
-    IF->Release();
-    */
         CMA.~CMatrixA();
         cin.get();
     }
