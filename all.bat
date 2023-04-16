@@ -1,14 +1,21 @@
-g++ -c .\server\interfaces.cpp -o .\server\interfaces.o
-g++ -c .\server\server.cpp -o .\server\server.o
+g++ -c .\source\server\interfaces.cpp -o .\build\server\interfaces.o
+g++ -c .\source\server\component.cpp -o .\build\server\component.o
+g++ -c .\source\server\container.cpp -o .\build\server\container.o
 
-xcopy .\server\server.o .\client\build /Y
-xcopy .\server\interfaces.o .\client\build /Y
-xcopy .\server\interfaces.h .\client\source /Y
+g++ -c .\source\server\dllmanager.cpp -o .\build\server\dllmanager.o
 
-g++ -c ./client/source/client.cpp  -o ./client/build/client.o
-g++ -c ./client/source/wrapper.cpp -o ./client/build/wrapper.o
+g++ -shared .\build\server\container.o .\build\server\component.o .\build\server\interfaces.o -o .\build\server\component.dll -Wl,--kill-at
 
-g++ ./client/build/client.o ./client/build/wrapper.o ./client/build/interfaces.o ./client/build/server.o    -o ./client.exe
+g++ -shared .\build\server\dllmanager.o -o .\build\server\dllmanager.dll -Wl,--kill-at
+
+xcopy .\source\server\interfaces.h  .\build\client /Y
+
+xcopy .\build\server\dllmanager.dll  .\build\client /Y
+
+g++ -c ./source/client/client.cpp  -o ./build/client/client.o
+g++ -c ./source/client/wrapper.cpp -o ./build/client/wrapper.o
+
+g++ ./build/client/client.o ./build/client/wrapper.o -o ./client.exe
 
 "client.exe"
 

@@ -1,6 +1,9 @@
 #pragma once
 
+#include <windows.h>
 #include "interfaces.h"
+
+typedef HRESULT __stdcall (*FunctionType) (const CLSID_& clsid, const IID_& iid, void** ppv);
 
 class EMatrix {
     private:
@@ -13,6 +16,7 @@ class EMatrix {
 class CMatrix {
     private:
         IMatrix* IM;
+        HINSTANCE h;
         CMatrix& operator=(const CMatrix&) {return *this;};
     public:
         CMatrix();
@@ -30,6 +34,7 @@ class CMatrixA {
     private:
         IMatrix* IM;
         IMatrixA* IMA;
+        HINSTANCE h;
         CMatrixA& operator=(const CMatrixA&) {return *this;};
     public:
         CMatrixA();

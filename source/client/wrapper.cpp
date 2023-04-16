@@ -1,5 +1,5 @@
+#include <stdio.h>
 #include "wrapper.h"
-#define NULL __null
 
 EMatrix::EMatrix(const char* msg) {
     this->msg = msg;
@@ -12,7 +12,26 @@ const char* EMatrix::GetMessage() {
 
 CMatrix::CMatrix() {
     IFactory *IF = NULL;
-    HRESULT_ res = GetClassObject(CLSID_Factory, IID_IFactory, (void**) &IF);
+
+    printf("Wrapper::GetClassObject\n");
+
+    FunctionType GCO;
+
+    h = LoadLibrary("./build/client/dllmanager.dll");
+
+    if (!h) {
+        printf("!\n");
+        throw EMatrix("Error while creating CMatrix: No dll");;
+    }
+
+    GCO = (FunctionType) GetProcAddress(h, "GetClassObject");
+
+    if (!GCO) {
+        printf("!!\n");
+        throw EMatrix("Error while creating CMatrix: No function");
+    }
+
+    HRESULT_ res = GCO(CLSID_Factory, IID_IFactory, (void**) &IF);
 
     if (res == E_NOCOMPONENT_) {
         throw EMatrix("Error while creating CMatrix: Unsupported component");
@@ -51,11 +70,31 @@ HRESULT_ __stdcall CMatrix::DetMatrix(double *a, double *det, int n) {
 
 CMatrix::~CMatrix() {
     IM->Release();
+    FreeLibrary(h);
 }
 
 CMatrixA::CMatrixA() {
     IFactory *IF = NULL;
-    HRESULT_ res = GetClassObject(CLSID_FactoryA, IID_IFactory, (void**) &IF);
+
+    printf("Wrapper::GetClassObject\n");
+
+    FunctionType GCO;
+
+    h = LoadLibrary("./build/client/dllmanager.dll");
+
+    if (!h) {
+        printf("!\n");
+        throw EMatrix("Error while creating CMatrix: No dll");;
+    }
+
+    GCO = (FunctionType) GetProcAddress(h, "GetClassObject");
+
+    if (!GCO) {
+        printf("!!\n");
+        throw EMatrix("Error while creating CMatrix: No function");
+    }
+
+    HRESULT_ res = GCO(CLSID_FactoryA, IID_IFactory, (void**) &IF);
 
     if (res == E_NOCOMPONENT_) {
         throw EMatrix("Error while creating CMatrixA: Unsupported component");
@@ -120,4 +159,5 @@ HRESULT_ __stdcall CMatrixA::InverseMatrix(double *a, double *b, int n) {
 CMatrixA::~CMatrixA() {
     IM->Release();
     IMA->Release();
+    FreeLibrary(h);
 }
