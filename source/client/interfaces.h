@@ -1,64 +1,46 @@
 #ifndef interfaces_h
 #define interfaces_h
 
-using CLSID_ = int;
-using IID_ = int;
-using HRESULT_ = int;
-using ULONG_ = int;
+#include <windows.h>
 
-const int IID_IUnknown_ = 0;
-const int IID_IMatrix = 1;
-const int IID_IMatrixA = 2;
-const int IID_IFactory = 100;
-const int IID_IFactoryA = 101;
+class Constants
+{
+public:
+        static IID IID_IUnknown;
+        static IID IID_IClassFactory;
 
+        static IID IID_IMatrix;
+        static IID IID_IMatrixA;
+        static IID IID_IFactoryA;
 
-const int S_OK_ = 0;
-const int E_NOINTERFACE_ = 1;
-const int E_NOCOMPONENT_ = 2;
-const int E_OUTOFMEMORY_ = 3;
-const int E_DET0_ = 4;
-
-const int CLSID_MATRIX = 1;
-const int CLSID_Factory = 1;
-const int CLSID_MATRIXA = 2;
-const int CLSID_FactoryA = 2;
-
-class IUnknown_ {
-        public:	
-                virtual HRESULT_ __stdcall QueryInterface(const IID_& iid, void** ppv)=0;
-                virtual ULONG_ __stdcall AddRef()=0;
-                virtual ULONG_ __stdcall Release()=0;
+        static CLSID CLSID_MATRIX;
+        static CLSID CLSID_MATRIXA;
+        static IID IID_IDispatch;
 };
 
-class IMatrix: public IUnknown_ {
-        public:
-                virtual HRESULT_ __stdcall AddMatrixNum(double *a, double b, double *c, int n, int m) = 0;
-                virtual HRESULT_ __stdcall SubMatrixNum(double *a, double b, double *c, int n, int m) = 0;
-                virtual HRESULT_ __stdcall MultMatrixNum(double *a, double b, double *c, int n, int m) = 0;
-                virtual HRESULT_ __stdcall DivMatrixNum(double *a, double b, double *c, int n, int m) = 0;
-                virtual HRESULT_ __stdcall DetMatrix(double *a, double *det, int n) = 0;
+class IMatrix : public IUnknown
+{
+public:
+        virtual HRESULT __stdcall AddMatrixNum(double *a, double b, double *c, int n, int m) = 0;
+        virtual HRESULT __stdcall SubMatrixNum(double *a, double b, double *c, int n, int m) = 0;
+        virtual HRESULT __stdcall MultMatrixNum(double *a, double b, double *c, int n, int m) = 0;
+        virtual HRESULT __stdcall DivMatrixNum(double *a, double b, double *c, int n, int m) = 0;
+        virtual HRESULT __stdcall DetMatrix(double *a, double *det, int n) = 0;
 };
 
-class IMatrixA: public IUnknown_ {
-        public:
-                virtual HRESULT_ __stdcall AddMatrix(double *a, double *b, double *c, int n, int m) = 0;
-                virtual HRESULT_ __stdcall MultMatrix(double *a, double *b, double *c, int n, int m, int p) = 0;
-                virtual HRESULT_ __stdcall TransMatrix(double *a, double *b, int n) = 0;
-                virtual HRESULT_ __stdcall InverseMatrix(double *a, double *b, int n) = 0;
+class IMatrixA : public IUnknown
+{
+public:
+        virtual HRESULT __stdcall AddMatrix(double *a, double *b, double *c, int n, int m) = 0;
+        virtual HRESULT __stdcall MultMatrix(double *a, double *b, double *c, int n, int m, int p) = 0;
+        virtual HRESULT __stdcall TransMatrix(double *a, double *b, int n) = 0;
+        virtual HRESULT __stdcall InverseMatrix(double *a, double *b, int n) = 0;
 };
 
-class IFactory: public IUnknown_ {
-        public:
-                virtual HRESULT_ __stdcall CreateInstance(const IID_& iid, void** ppv) = 0;
+class IFactoryA : public IUnknown
+{
+public:
+        virtual HRESULT __stdcall CreateInstanceA(const IID &iid, void **ppv) = 0;
 };
-
-class IFactoryA: public IUnknown_ {
-        public:
-                virtual HRESULT_ __stdcall CreateInstanceA(const IID_& iid, void** ppv) = 0;
-};
-
-HRESULT_ __stdcall GetClassObject(const CLSID_& clsid, const IID_& iid, void** ppv);
-HRESULT_ __stdcall CreateInstance(const CLSID_& clsid, const IID_& iid, void** ppv);
 
 #endif

@@ -3,70 +3,81 @@
 
 #include "interfaces.h"
 
-class Matrix: public IMatrix {
-	private:
-	    int fRefCount;
-	public:
-		Matrix();
-	    ~Matrix();
+class Matrix : public IMatrix
+{
+private:
+	int fRefCount;
 
-	    virtual HRESULT_ __stdcall QueryInterface(const IID_& iid, void** ppv);
-	    virtual ULONG_ __stdcall AddRef();
-	    virtual ULONG_ __stdcall Release();
+public:
+	Matrix();
+	~Matrix();
 
-		virtual HRESULT_ __stdcall AddMatrixNum(double *a, double b, double *c, int n, int m);
-        virtual HRESULT_ __stdcall SubMatrixNum(double *a, double b, double *c, int n, int m);
-        virtual HRESULT_ __stdcall MultMatrixNum(double *a, double b, double *c, int n, int m);
-        virtual HRESULT_ __stdcall DivMatrixNum(double *a, double b, double *c, int n, int m);
-        virtual HRESULT_ __stdcall DetMatrix(double *a, double *det, int n);
+	virtual HRESULT __stdcall QueryInterface(const IID &iid, void **ppv);
+	virtual ULONG __stdcall AddRef();
+	virtual ULONG __stdcall Release();
+
+	virtual HRESULT __stdcall AddMatrixNum(double *a, double b, double *c, int n, int m);
+	virtual HRESULT __stdcall SubMatrixNum(double *a, double b, double *c, int n, int m);
+	virtual HRESULT __stdcall MultMatrixNum(double *a, double b, double *c, int n, int m);
+	virtual HRESULT __stdcall DivMatrixNum(double *a, double b, double *c, int n, int m);
+	virtual HRESULT __stdcall DetMatrix(double *a, double *det, int n);
 };
 
-class MatrixA: public IMatrix, IMatrixA {
-	private:
-	    int fRefCount;
-	public:
-	    MatrixA();
-	    ~MatrixA();
+class MatrixA : public IMatrix, IMatrixA
+{
+private:
+	int fRefCount;
 
-	    virtual HRESULT_ __stdcall QueryInterface(const IID_& iid, void** ppv);
-	    virtual ULONG_ __stdcall AddRef();
-	    virtual ULONG_ __stdcall Release();
+public:
+	MatrixA();
+	~MatrixA();
 
-		virtual HRESULT_ __stdcall AddMatrixNum(double *a, double b, double *c, int n, int m);
-        virtual HRESULT_ __stdcall SubMatrixNum(double *a, double b, double *c, int n, int m);
-        virtual HRESULT_ __stdcall MultMatrixNum(double *a, double b, double *c, int n, int m);
-        virtual HRESULT_ __stdcall DivMatrixNum(double *a, double b, double *c, int n, int m);
-        virtual HRESULT_ __stdcall DetMatrix(double *a, double *det, int n);
+	virtual HRESULT __stdcall QueryInterface(const IID &iid, void **ppv);
+	virtual ULONG __stdcall AddRef();
+	virtual ULONG __stdcall Release();
 
-        virtual HRESULT_ __stdcall AddMatrix(double *a, double *b, double *c, int n, int m);
-        virtual HRESULT_ __stdcall MultMatrix(double *a, double *b, double *c, int n, int m, int p);
-		virtual HRESULT_ __stdcall TransMatrix(double *a, double *b, int n);
-		virtual HRESULT_ __stdcall InverseMatrix(double *a, double *b, int n);
-        
+	virtual HRESULT __stdcall AddMatrixNum(double *a, double b, double *c, int n, int m);
+	virtual HRESULT __stdcall SubMatrixNum(double *a, double b, double *c, int n, int m);
+	virtual HRESULT __stdcall MultMatrixNum(double *a, double b, double *c, int n, int m);
+	virtual HRESULT __stdcall DivMatrixNum(double *a, double b, double *c, int n, int m);
+	virtual HRESULT __stdcall DetMatrix(double *a, double *det, int n);
+
+	virtual HRESULT __stdcall AddMatrix(double *a, double *b, double *c, int n, int m);
+	virtual HRESULT __stdcall MultMatrix(double *a, double *b, double *c, int n, int m, int p);
+	virtual HRESULT __stdcall TransMatrix(double *a, double *b, int n);
+	virtual HRESULT __stdcall InverseMatrix(double *a, double *b, int n);
 };
 
-class Factory: public IFactory, IFactoryA {
-	private:
-		int fRefCount;
-	public:
-		virtual HRESULT_ __stdcall QueryInterface(const IID_& iid, void** ppv);
-	    virtual ULONG_ __stdcall AddRef();
-	    virtual ULONG_ __stdcall Release();
+class Factory : public IClassFactory, IFactoryA
+{
+private:
+	int fRefCount;
 
-		virtual HRESULT_ __stdcall CreateInstance(const IID_& iid, void** ppv);
-		virtual HRESULT_ __stdcall CreateInstanceA(const IID_& iid, void** ppv);
+public:
+	virtual HRESULT __stdcall QueryInterface(const IID &iid, void **ppv);
+	virtual ULONG __stdcall AddRef();
+	virtual ULONG __stdcall Release();
+
+	virtual HRESULT __stdcall CreateInstance(IUnknown *pUnkOuter, const IID &iid, void **ppv);
+	virtual HRESULT __stdcall CreateInstanceA(const IID &iid, void **ppv);
+
+	virtual HRESULT __stdcall LockServer(BOOL fLock);
 };
 
-class FactoryA: public IFactory, IFactoryA {
-	private:
-		int fRefCount;
-	public:
-		virtual HRESULT_ __stdcall QueryInterface(const IID_& iid, void** ppv);
-	    virtual ULONG_ __stdcall AddRef();
-	    virtual ULONG_ __stdcall Release();
+class FactoryA : public IClassFactory, IFactoryA
+{
+private:
+	int fRefCount;
 
-		virtual HRESULT_ __stdcall CreateInstance(const IID_& iid, void** ppv);
-		virtual HRESULT_ __stdcall CreateInstanceA(const IID_& iid, void** ppv);
+public:
+	virtual HRESULT __stdcall QueryInterface(const IID &iid, void **ppv);
+	virtual ULONG __stdcall AddRef();
+	virtual ULONG __stdcall Release();
+
+	virtual HRESULT __stdcall CreateInstance(IUnknown *pUnkOuter, const IID &iid, void **ppv);
+	virtual HRESULT __stdcall CreateInstanceA(const IID &iid, void **ppv);
+
+	virtual HRESULT __stdcall LockServer(BOOL fLock);
 };
 
 #endif // SERVER_H_INCLUDED

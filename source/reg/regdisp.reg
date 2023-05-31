@@ -1,0 +1,6 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_CLASSES_ROOT\KKE.Application]
+
+[HKEY_CLASSES_ROOT\KKE.Application\CLSID]
+@="{1D778C4C-A00C-4505-B18D-5BCD0004CFC9}"
