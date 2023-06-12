@@ -8,13 +8,13 @@ IID Constants::IID_IUnknown = {0x00000000, 0x0000, 0x0000, {0xC0, 0x00, 0x00, 0x
 IID Constants::IID_IClassFactory = {0x00000001, 0x0000, 0x0000, {0xC0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x46}};
 
 IID Constants::IID_IMatrix = {0x00000001, 0x0000, 0x0000, {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}};
-IID Constants::IID_IMatrixA = {0x00000002, 0x0000, 0x0000, {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}};
-IID Constants::IID_IFactoryA = {0x00000011, 0x0000, 0x0000, {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}};
+IID Constants::IID_IMatrixAdvanced = {0x00000002, 0x0000, 0x0000, {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}};
+IID Constants::IID_IFactoryAdvanced = {0x00000011, 0x0000, 0x0000, {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}};
 
 //{1D778C4C-A00C-4505-B18D-5BCD0004CFC9}
-CLSID Constants::CLSID_MATRIX = {0x1D778C4C, 0xA00C, 0x4505, {0xB1, 0x8D, 0x5B, 0xCD, 0x00, 0x04, 0xCF, 0xC9}};
+CLSID Constants::CLSID_Matrix = {0x1D778C4C, 0xA00C, 0x4505, {0xB1, 0x8D, 0x5B, 0xCD, 0x00, 0x04, 0xCF, 0xC9}};
 //{D7C3EE79-C27E-4BAE-95C6-08CF8FA30DDC}
-CLSID Constants::CLSID_MATRIXA = {0xD7C3EE79, 0xC27E, 0x4BAE, {0x95, 0xC6, 0x08, 0xCF, 0x8F, 0xA3, 0x0D, 0xDC}};
+CLSID Constants::CLSID_MatrixAdvanced = {0xD7C3EE79, 0xC27E, 0x4BAE, {0x95, 0xC6, 0x08, 0xCF, 0x8F, 0xA3, 0x0D, 0xDC}};
 
 IID Constants::IID_IDispatch = {0x00020400, 0x0000, 0x0000, {0xC0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x46}};
 
@@ -41,6 +41,10 @@ HRESULT __stdcall Matrix::QueryInterface(const IID &iid, void **ppv)
     {
         *ppv = static_cast<IMatrix *>(this);
     }
+    else if (iid == Constants::IID_IDispatch)
+    {
+        *ppv = static_cast<IDispatch*>(this);
+    }
     else
     {
         *ppv = NULL;
@@ -64,7 +68,7 @@ ULONG __stdcall Matrix::Release()
     cout << "Matrix::Release" << endl;
     fRefCount--;
     cout << "Current references: " << fRefCount << endl;
-    if (fRefCount == 0)
+    if (fRefCount <= 0)
     {
         cout << "Self-destructing..." << endl;
         delete this;
@@ -110,7 +114,7 @@ HRESULT __stdcall Matrix::DivMatrixNum(double *a, double b, double *c, int n, in
 HRESULT __stdcall Matrix::DetMatrix(double *a, double *det, int n)
 {
     cout << "Matrix::DetMatrix" << endl;
-    double eps = 0.0000000001;
+    double epsilon = 0.0000000001;
     double d = 1.0;
     double tmp;
     double matrix[n][n];
@@ -126,7 +130,7 @@ HRESULT __stdcall Matrix::DetMatrix(double *a, double *det, int n)
     {
         for (int j = i + 1; j < n; j++)
         {
-            while (fabs(matrix[j][i]) > eps)
+            while (fabs(matrix[j][i]) > epsilon)
             {
                 tmp = matrix[i][i] / matrix[j][i];
                 for (int k = 0; k < n; k++)
@@ -143,20 +147,102 @@ HRESULT __stdcall Matrix::DetMatrix(double *a, double *det, int n)
     return S_OK;
 }
 
-MatrixA::MatrixA()
+HRESULT __stdcall Matrix::GetIDsOfNames(REFIID riid, LPOLESTR *rgszNames, UINT cNames, LCID lcid, DISPID *rgDispId)
 {
-    cout << "MatrixA::Constructor" << endl;
+    printf("Matrix::GetIDsOfNames\n");
+
+    if (cNames != 1)
+    {
+        return E_NOTIMPL;
+    }
+
+    if (wcscmp(rgszNames[0], L"AddMatrixNum") == 0)
+    {
+        rgDispId[0] = 1;
+    }
+
+    else if (wcscmp(rgszNames[0], L"SubMatrixNum") == 0)
+    {
+        rgDispId[0] = 2;
+    }
+
+    else if (wcscmp(rgszNames[0], L"MultMatrixNum") == 0)
+    {
+        rgDispId[0] = 3;
+    }
+
+    else if (wcscmp(rgszNames[0], L"DivMatrixNum") == 0)
+    {
+        rgDispId[0] = 4;
+    }
+
+    else if (wcscmp(rgszNames[0], L"DetMatrix") == 0)
+    {
+        rgDispId[0] = 5;
+    }
+
+    else
+    {
+        return E_NOTIMPL;
+    }
+
+    return S_OK;
+}
+
+HRESULT __stdcall Matrix::Invoke(DISPID dispIdMember, REFIID riid, LCID lcid, WORD wFlags, DISPPARAMS *pDispParams, VARIANT *pVarResult, EXCEPINFO *pExcepInfo, UINT *puArgErr)
+{
+    if (dispIdMember == 1)
+    {
+        printf("Matrix::Invoke::1");
+    }
+    else if (dispIdMember == 2)
+    {
+        printf("Matrix::Invoke::2");
+    }
+    else if (dispIdMember == 3)
+    {
+        printf("Matrix::Invoke::3");
+    }
+    else if (dispIdMember == 4)
+    {
+        printf("Matrix::Invoke::4");
+    }
+    else if (dispIdMember == 5)
+    {
+        printf("Matrix::Invoke::5");
+    }
+    else
+    {
+        return E_NOTIMPL;
+    }
+
+    return S_OK;
+}
+
+HRESULT __stdcall Matrix::GetTypeInfoCount(UINT *pctinfo)
+{
+    return S_OK;
+}
+
+HRESULT __stdcall Matrix::GetTypeInfo(UINT iTInfo, LCID lcid, ITypeInfo **ppTInfo)
+{
+    return S_OK;
+}
+
+MatrixAdvanced::MatrixAdvanced()
+{
+    cout << "MatrixAdvanced::Constructor" << endl;
     fRefCount = 0;
 }
 
-MatrixA::~MatrixA()
+MatrixAdvanced::~MatrixAdvanced()
 {
-    cout << "MatrixA::Destructor" << endl;
+    cout << "MatrixAdvanced::Destructor" << endl;
 }
 
-HRESULT __stdcall MatrixA::QueryInterface(const IID &iid, void **ppv)
+HRESULT __stdcall MatrixAdvanced::QueryInterface(const IID &iid, void **ppv)
 {
-    // cout << "MatrixA::QueryInterface:" << iid << endl;
+    // cout << "MatrixAdvanced::QueryInterface:" << iid << endl;
 
     if (iid == Constants::IID_IUnknown)
     {
@@ -166,9 +252,9 @@ HRESULT __stdcall MatrixA::QueryInterface(const IID &iid, void **ppv)
     {
         *ppv = static_cast<IMatrix *>(this);
     }
-    else if (iid == Constants::IID_IMatrixA)
+    else if (iid == Constants::IID_IMatrixAdvanced)
     {
-        *ppv = static_cast<IMatrixA *>(this);
+        *ppv = static_cast<IMatrixAdvanced *>(this);
     }
     else
     {
@@ -179,20 +265,20 @@ HRESULT __stdcall MatrixA::QueryInterface(const IID &iid, void **ppv)
     return S_OK;
 }
 
-ULONG __stdcall MatrixA::AddRef()
+ULONG __stdcall MatrixAdvanced::AddRef()
 {
-    cout << "MatrixA::AddRef" << endl;
+    cout << "MatrixAdvanced::AddRef" << endl;
     fRefCount++;
     cout << "Current references: " << fRefCount << endl;
     return fRefCount;
 }
 
-ULONG __stdcall MatrixA::Release()
+ULONG __stdcall MatrixAdvanced::Release()
 {
-    cout << "MatrixA::Release" << endl;
+    cout << "MatrixAdvanced::Release" << endl;
     fRefCount--;
     cout << "Current references: " << fRefCount << endl;
-    if (fRefCount == 0)
+    if (fRefCount <= 0)
     {
         cout << "Self-destructing..." << endl;
         delete this;
@@ -201,7 +287,7 @@ ULONG __stdcall MatrixA::Release()
     return fRefCount;
 }
 
-HRESULT __stdcall MatrixA::AddMatrixNum(double *a, double b, double *c, int n, int m)
+HRESULT __stdcall MatrixAdvanced::AddMatrixNum(double *a, double b, double *c, int n, int m)
 {
     for (int i = 0; i < n; i++)
     {
@@ -213,12 +299,12 @@ HRESULT __stdcall MatrixA::AddMatrixNum(double *a, double b, double *c, int n, i
     return S_OK;
 }
 
-HRESULT __stdcall MatrixA::SubMatrixNum(double *a, double b, double *c, int n, int m)
+HRESULT __stdcall MatrixAdvanced::SubMatrixNum(double *a, double b, double *c, int n, int m)
 {
-    return MatrixA::AddMatrixNum(a, -b, c, n, m);
+    return MatrixAdvanced::AddMatrixNum(a, -b, c, n, m);
 }
 
-HRESULT __stdcall MatrixA::MultMatrixNum(double *a, double b, double *c, int n, int m)
+HRESULT __stdcall MatrixAdvanced::MultMatrixNum(double *a, double b, double *c, int n, int m)
 {
     for (int i = 0; i < n; i++)
     {
@@ -230,15 +316,15 @@ HRESULT __stdcall MatrixA::MultMatrixNum(double *a, double b, double *c, int n, 
     return S_OK;
 }
 
-HRESULT __stdcall MatrixA::DivMatrixNum(double *a, double b, double *c, int n, int m)
+HRESULT __stdcall MatrixAdvanced::DivMatrixNum(double *a, double b, double *c, int n, int m)
 {
-    return MatrixA::MultMatrixNum(a, 1 / b, c, n, m);
+    return MatrixAdvanced::MultMatrixNum(a, 1 / b, c, n, m);
 }
 
-HRESULT __stdcall MatrixA::DetMatrix(double *a, double *det, const int n)
+HRESULT __stdcall MatrixAdvanced::DetMatrix(double *a, double *det, const int n)
 {
-    cout << "MatrixA::DetMatrix" << endl;
-    double eps = 0.0000000001;
+    cout << "MatrixAdvanced::DetMatrix" << endl;
+    double epsilon = 0.0000000001;
     double d = 1.0;
     double tmp;
     double matrix[n][n];
@@ -254,7 +340,7 @@ HRESULT __stdcall MatrixA::DetMatrix(double *a, double *det, const int n)
     {
         for (int j = i + 1; j < n; j++)
         {
-            while (fabs(matrix[j][i]) > eps)
+            while (fabs(matrix[j][i]) > epsilon)
             {
                 tmp = matrix[i][i] / matrix[j][i];
                 for (int k = 0; k < n; k++)
@@ -271,7 +357,7 @@ HRESULT __stdcall MatrixA::DetMatrix(double *a, double *det, const int n)
     return S_OK;
 }
 
-HRESULT __stdcall MatrixA::AddMatrix(double *a, double *b, double *c, int n, int m)
+HRESULT __stdcall MatrixAdvanced::AddMatrix(double *a, double *b, double *c, int n, int m)
 {
     for (int i = 0; i < n; i++)
     {
@@ -283,7 +369,7 @@ HRESULT __stdcall MatrixA::AddMatrix(double *a, double *b, double *c, int n, int
     return S_OK;
 }
 
-HRESULT __stdcall MatrixA::MultMatrix(double *a, double *b, double *c, int n, int m, int p)
+HRESULT __stdcall MatrixAdvanced::MultMatrix(double *a, double *b, double *c, int n, int m, int p)
 {
     for (int i = 0; i < n; i++)
     {
@@ -299,7 +385,7 @@ HRESULT __stdcall MatrixA::MultMatrix(double *a, double *b, double *c, int n, in
     return S_OK;
 }
 
-HRESULT __stdcall MatrixA::TransMatrix(double *a, double *b, int n)
+HRESULT __stdcall MatrixAdvanced::TransMatrix(double *a, double *b, int n)
 {
     for (int i = 0; i < n; i++)
     {
@@ -311,10 +397,10 @@ HRESULT __stdcall MatrixA::TransMatrix(double *a, double *b, int n)
     return S_OK;
 }
 
-HRESULT __stdcall MatrixA::InverseMatrix(double *a, double *b, int n)
+HRESULT __stdcall MatrixAdvanced::InverseMatrix(double *a, double *b, int n)
 {
     double *det = new double();
-    MatrixA::DetMatrix(a, det, n);
+    MatrixAdvanced::DetMatrix(a, det, n);
     if (*det != 0)
     {
         double temp;
@@ -399,9 +485,9 @@ HRESULT __stdcall Factory::QueryInterface(const IID &iid, void **ppv)
     {
         *ppv = static_cast<IClassFactory *>(this);
     }
-    else if (iid == Constants::IID_IFactoryA)
+    else if (iid == Constants::IID_IFactoryAdvanced)
     {
-        *ppv = static_cast<IFactoryA *>(this);
+        *ppv = static_cast<IFactoryAdvanced *>(this);
     }
     else
     {
@@ -446,7 +532,7 @@ HRESULT __stdcall Factory::CreateInstance(IUnknown *pIUnknownOuter, const IID &i
     return obj->QueryInterface(iid, ppv);
 }
 
-HRESULT __stdcall Factory::CreateInstanceA(const IID &iid, void **ppv)
+HRESULT __stdcall Factory::CreateInstance(const IID &iid, void **ppv)
 {
     // cout << "Factory::CreateInstance:" << ":" << iid << endl;
     IUnknown *obj = NULL;
@@ -463,9 +549,9 @@ HRESULT __stdcall Factory::LockServer(BOOL fLock)
     return S_OK;
 }
 
-HRESULT __stdcall FactoryA::QueryInterface(const IID &iid, void **ppv)
+HRESULT __stdcall FactoryAdvanced::QueryInterface(const IID &iid, void **ppv)
 {
-    // cout << "FactoryA::QueryInterface:" << iid << endl;
+    // cout << "FactoryAdvanced::QueryInterface:" << iid << endl;
 
     if (iid == Constants::IID_IUnknown)
     {
@@ -475,9 +561,9 @@ HRESULT __stdcall FactoryA::QueryInterface(const IID &iid, void **ppv)
     {
         *ppv = static_cast<IClassFactory *>(this);
     }
-    else if (iid == Constants::IID_IFactoryA)
+    else if (iid == Constants::IID_IFactoryAdvanced)
     {
-        *ppv = static_cast<IFactoryA *>(this);
+        *ppv = static_cast<IFactoryAdvanced *>(this);
     }
     else
     {
@@ -488,17 +574,17 @@ HRESULT __stdcall FactoryA::QueryInterface(const IID &iid, void **ppv)
     return S_OK;
 }
 
-ULONG __stdcall FactoryA::AddRef()
+ULONG __stdcall FactoryAdvanced::AddRef()
 {
-    cout << "FactoryA::AddRef" << endl;
+    cout << "FactoryAdvanced::AddRef" << endl;
     fRefCount++;
     cout << "Current references: " << fRefCount << endl;
     return fRefCount;
 }
 
-ULONG __stdcall FactoryA::Release()
+ULONG __stdcall FactoryAdvanced::Release()
 {
-    cout << "FactoryA::Release" << endl;
+    cout << "FactoryAdvanced::Release" << endl;
     fRefCount--;
     cout << "Current references: " << fRefCount << endl;
     if (fRefCount == 0)
@@ -510,23 +596,23 @@ ULONG __stdcall FactoryA::Release()
     return fRefCount;
 }
 
-HRESULT __stdcall FactoryA::CreateInstance(IUnknown *pIUnknownOuter, const IID &iid, void **ppv)
+HRESULT __stdcall FactoryAdvanced::CreateInstance(IUnknown *pIUnknownOuter, const IID &iid, void **ppv)
 {
-    // cout << "FactoryA::CreateInstance:" << ":" << iid << endl;
+    // cout << "FactoryAdvanced::CreateInstance:" << ":" << iid << endl;
     IUnknown *obj = NULL;
-    obj = (IUnknown *)(IMatrix *)new MatrixA();
+    obj = (IUnknown *)(IMatrix *)new MatrixAdvanced();
     return obj->QueryInterface(iid, ppv);
 }
 
-HRESULT __stdcall FactoryA::CreateInstanceA(const IID &iid, void **ppv)
+HRESULT __stdcall FactoryAdvanced::CreateInstance(const IID &iid, void **ppv)
 {
-    // cout << "FactoryA::CreateInstance:" << ":" << iid << endl;
+    // cout << "FactoryAdvanced::CreateInstance:" << ":" << iid << endl;
     IUnknown *obj = NULL;
-    obj = (IUnknown *)(IMatrix *)new MatrixA();
+    obj = (IUnknown *)(IMatrix *)new MatrixAdvanced();
     return obj->QueryInterface(iid, ppv);
 }
 
-HRESULT __stdcall FactoryA::LockServer(BOOL fLock)
+HRESULT __stdcall FactoryAdvanced::LockServer(BOOL fLock)
 {
     return S_OK;
 }

@@ -7,17 +7,17 @@
 
 extern "C" HRESULT __stdcall __declspec(dllexport) DllGetClassObject(const CLSID &clsid, const IID &iid, void **ppv)
 {
-    printf("Component::GetClassObject:");
+    printf("Component::GetClassObject:\n");
 
     IUnknown *obj = NULL;
 
-    if (clsid == Constants::CLSID_MATRIX)
+    if (clsid == Constants::CLSID_Matrix)
     {
         obj = (IUnknown *)(IClassFactory *)new Factory();
     }
-    else if (clsid == Constants::CLSID_MATRIXA)
+    else if (clsid == Constants::CLSID_MatrixAdvanced)
     {
-        obj = (IUnknown *)(IFactoryA *)new FactoryA();
+        obj = (IUnknown *)(IFactoryAdvanced *)new FactoryAdvanced();
     }
     else if (obj == NULL)
     {
@@ -28,7 +28,7 @@ extern "C" HRESULT __stdcall __declspec(dllexport) DllGetClassObject(const CLSID
 
 extern "C" __declspec(dllexport) HRESULT __stdcall DllCreateInstance(const CLSID &clsid, const IID &iid, void **ppv)
 {
-    printf("Component::CreateInstance:");
+    printf("Component::CreateInstance:\n");
 
     IClassFactory *F = NULL;
     DllGetClassObject(clsid, Constants::IID_IClassFactory, (void **)&F);

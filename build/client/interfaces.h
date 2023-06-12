@@ -10,11 +10,11 @@ public:
         static IID IID_IClassFactory;
 
         static IID IID_IMatrix;
-        static IID IID_IMatrixA;
-        static IID IID_IFactoryA;
+        static IID IID_IMatrixAdvanced;
+        static IID IID_IFactoryAdvanced;
 
-        static CLSID CLSID_MATRIX;
-        static CLSID CLSID_MATRIXA;
+        static CLSID CLSID_Matrix;
+        static CLSID CLSID_MatrixAdvanced;
         static IID IID_IDispatch;
 };
 
@@ -28,7 +28,7 @@ public:
         virtual HRESULT __stdcall DetMatrix(double *a, double *det, int n) = 0;
 };
 
-class IMatrixA : public IUnknown
+class IMatrixAdvanced : public IUnknown
 {
 public:
         virtual HRESULT __stdcall AddMatrix(double *a, double *b, double *c, int n, int m) = 0;
@@ -37,10 +37,10 @@ public:
         virtual HRESULT __stdcall InverseMatrix(double *a, double *b, int n) = 0;
 };
 
-class IFactoryA : public IUnknown
+class IFactoryAdvanced : public IUnknown
 {
 public:
-        virtual HRESULT __stdcall CreateInstanceA(const IID &iid, void **ppv) = 0;
+        virtual HRESULT __stdcall CreateInstance(const IID &iid, void **ppv) = 0;
 };
 
 #endif

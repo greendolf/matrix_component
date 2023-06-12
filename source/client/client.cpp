@@ -55,9 +55,8 @@ int main()
                  << "Trans M: " << endl;
             show(test2, n, n);
         }
-        CMA.~CMatrixA();
         cin.get();
-        printf("%s", "CLIENT FINISH");
+        printf("%s\n", "CLIENT FINISH");
     }
     catch (EMatrix &e)
     {
