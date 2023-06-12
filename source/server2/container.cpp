@@ -1,7 +1,9 @@
-// #include "interfaces.h"
+//#include "interfaces.h"
 #include "component.h"
-// #include <windows.h>
+//#include <windows.h>
 #include <stdio.h>
+
+
 
 extern "C" HRESULT __stdcall __declspec(dllexport) DllGetClassObject(const CLSID &clsid, const IID &iid, void **ppv)
 {
@@ -9,9 +11,9 @@ extern "C" HRESULT __stdcall __declspec(dllexport) DllGetClassObject(const CLSID
 
     IUnknown *obj = NULL;
 
-    if (clsid == Constants::CLSID_MatrixAdvanced)
+    if (clsid == Constants::CLSID_Matrix)
     {
-        obj = (IUnknown *)(IFactoryAdvanced *)new FactoryAdvanced();
+        obj = (IUnknown *)(IClassFactory *)new Factory();
     }
     else if (obj == NULL)
     {
@@ -39,11 +41,11 @@ BOOL APIENTRY DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
     switch (fdwReason)
     {
     case DLL_PROCESS_ATTACH:
-        printf("Container attached\n");
+        printf("Including container attached\n");
         break;
 
     case DLL_PROCESS_DETACH:
-        printf("Container detached\n");
+        printf("Including container detached\n");
         break;
 
     case DLL_THREAD_ATTACH:
