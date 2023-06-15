@@ -18,11 +18,25 @@ Matrix::Matrix()
 {
     cout << "Matrix::Constructor" << endl;
     fRefCount = 0;
+    this->matrix = new double;
+}
+
+Matrix::Matrix(double *a, int n, int m)
+{
+    this->matrix = new double;
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < m; j++)
+        {
+            this->matrix[i * m + j] = a[i * m + j];
+        }
+    }
 }
 
 Matrix::~Matrix()
 {
     cout << "Matrix::Destructor" << endl;
+    delete this->matrix;
 }
 
 HRESULT __stdcall Matrix::QueryInterface(const IID &iid, void **ppv)
@@ -73,41 +87,64 @@ ULONG __stdcall Matrix::Release()
     return fRefCount;
 }
 
-HRESULT __stdcall Matrix::AddMatrixNum(double *a, double b, double *c, int n, int m)
+HRESULT __stdcall Matrix::SetMatrix(double *a, int n, int m)
 {
     for (int i = 0; i < n; i++)
     {
-        for (int j = 0; j < n; j++)
+        for (int j = 0; j < m; j++)
         {
-            c[i * m + j] = a[i * m + j] + b;
+            this->matrix[i * m + j] = a[i * m + j];
+        }
+    }
+    return S_OK;
+}
+HRESULT __stdcall Matrix::GetMatrix(double **a)
+{
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < m; j++)
+        {
+            *a[i * m + j] = this->matrix[i * m + j];
         }
     }
     return S_OK;
 }
 
-HRESULT __stdcall Matrix::SubMatrixNum(double *a, double b, double *c, int n, int m)
-{
-    return Matrix::AddMatrixNum(a, -b, c, n, m);
-}
-
-HRESULT __stdcall Matrix::MultMatrixNum(double *a, double b, double *c, int n, int m)
+HRESULT __stdcall Matrix::AddMatrixNum(double b, double *c, int n, int m)
 {
     for (int i = 0; i < n; i++)
     {
-        for (int j = 0; j < n; j++)
+        for (int j = 0; j < m; j++)
         {
-            c[i * m + j] = a[i * m + j] * b;
+            c[i * m + j] = this->matrix[i * m + j] + b;
         }
     }
     return S_OK;
 }
 
-HRESULT __stdcall Matrix::DivMatrixNum(double *a, double b, double *c, int n, int m)
+HRESULT __stdcall Matrix::SubMatrixNum(double b, double *c, int n, int m)
 {
-    return Matrix::MultMatrixNum(a, 1 / b, c, n, m);
+    return Matrix::AddMatrixNum(-b, c, n, m);
 }
 
-HRESULT __stdcall Matrix::DetMatrix(double *a, double *det, int n)
+HRESULT __stdcall Matrix::MultMatrixNum(double b, double *c, int n, int m)
+{
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < m; j++)
+        {
+            c[i * m + j] = this->matrix[i * m + j] * b;
+        }
+    }
+    return S_OK;
+}
+
+HRESULT __stdcall Matrix::DivMatrixNum(double b, double *c, int n, int m)
+{
+    return Matrix::MultMatrixNum(1 / b, c, n, m);
+}
+
+HRESULT __stdcall Matrix::DetMatrix(double *det, int n)
 {
     cout << "Matrix::DetMatrix" << endl;
     double epsilon = 0.0000000001;
@@ -119,7 +156,7 @@ HRESULT __stdcall Matrix::DetMatrix(double *a, double *det, int n)
     {
         for (int j = 0; j < n; j++)
         {
-            matrix[i][j] = a[i * n + j];
+            matrix[i][j] = this->matrix[i * n + j];
         }
     }
     for (int i = 0; i < n; i++)
@@ -289,6 +326,18 @@ HRESULT __stdcall Factory::CreateInstance(const IID &iid, void **ppv)
     // cout << "Factory::CreateInstance:" << ":" << iid << endl;
     IUnknown *obj = NULL;
     obj = (IUnknown *)(IMatrix *)new Matrix();
+    if (obj == NULL)
+    {
+        return E_OUTOFMEMORY;
+    }
+    return obj->QueryInterface(iid, ppv);
+}
+
+HRESULT __stdcall Factory::CreateInstanceAdvanced(const IID &iid, void **ppv, double *a, int n, int m)
+{
+    // cout << "Factory::CreateInstanceAdvanced:" << ":" << iid << endl;
+    IUnknown *obj = NULL;
+    obj = (IUnknown *)(IMatrix *)new Matrix(a, n, m);
     if (obj == NULL)
     {
         return E_OUTOFMEMORY;

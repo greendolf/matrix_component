@@ -21,6 +21,9 @@ public:
 class IMatrix : public IUnknown
 {
 public:
+        virtual HRESULT __stdcall SetMatrix(double *a, int n, int m) = 0;
+        virtual HRESULT __stdcall GetMatrix(double **a) = 0;
+
         virtual HRESULT __stdcall AddMatrixNum(double *a, double b, double *c, int n, int m) = 0;
         virtual HRESULT __stdcall SubMatrixNum(double *a, double b, double *c, int n, int m) = 0;
         virtual HRESULT __stdcall MultMatrixNum(double *a, double b, double *c, int n, int m) = 0;
@@ -41,6 +44,7 @@ class IFactoryAdvanced : public IUnknown
 {
 public:
         virtual HRESULT __stdcall CreateInstance(const IID &iid, void **ppv) = 0;
+        virtual HRESULT __stdcall CreateInstanceAdvanced(const IID &iid, void **ppv, double *a, int n, int m) = 0;
 };
 
 #endif

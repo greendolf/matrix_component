@@ -20,7 +20,7 @@ CMatrix::CMatrix()
 
     IClassFactory *ICF = NULL;
 
-    HRESULT res = CoGetClassObject(Constants::CLSID_MATRIX, CLSCTX_INPROC_SERVER, NULL, Constants::IID_IClassFactory, (void **)&ICF);
+    HRESULT res = CoGetClassObject(Constants::CLSID_Matrix, CLSCTX_INPROC_SERVER, NULL, Constants::IID_IClassFactory, (void **)&ICF);
     if (res == E_NOTIMPL)
     {
         throw EMatrix("Error while creating CMatrix: Unsupported component");
@@ -45,29 +45,62 @@ CMatrix::CMatrix()
     }
 }
 
-HRESULT __stdcall CMatrix::AddMatrixNum(double *a, double b, double *c, int n, int m)
+CMatrix::CMatrix(double *a, int n, int m)
 {
-    return IM->AddMatrixNum(a, b, c, n, m);
+    CoInitialize(NULL);
+
+    printf("Wrapper::GetClassObject\n");
+
+    IFactoryAdvanced *ICF = NULL;
+
+    HRESULT res = CoGetClassObject(Constants::CLSID_Matrix, CLSCTX_INPROC_SERVER, NULL, Constants::IID_IFactoryAdvanced, (void **)&ICF);
+    if (res == E_NOTIMPL)
+    {
+        throw EMatrix("Error while creating CMatrix: Unsupported component");
+    }
+    else if (res == E_NOINTERFACE)
+    {
+        throw EMatrix("Error while creating CMatrix: Unsupported interface");
+    }
+    else if (res != S_OK)
+    {
+        throw EMatrix("Error while creating CMatrix: Unknown error");
+    }
+
+    res = ICF->CreateInstanceAdvanced(Constants::IID_IMatrix, (void **)&IM, a, n, m);
+    if (res == S_OK)
+    {
+        ICF->Release();
+    }
+    else
+    {
+        throw EMatrix("Error while creating CMatrix: Unsupported interface");
+    }
 }
 
-HRESULT __stdcall CMatrix::SubMatrixNum(double *a, double b, double *c, int n, int m)
+HRESULT __stdcall CMatrix::AddMatrixNum(double b, double *c, int n, int m)
 {
-    return IM->SubMatrixNum(a, b, c, n, m);
+    return IM->AddMatrixNum(b, c, n, m);
 }
 
-HRESULT __stdcall CMatrix::MultMatrixNum(double *a, double b, double *c, int n, int m)
+HRESULT __stdcall CMatrix::SubMatrixNum(double b, double *c, int n, int m)
 {
-    return IM->MultMatrixNum(a, b, c, n, m);
+    return IM->SubMatrixNum(b, c, n, m);
 }
 
-HRESULT __stdcall CMatrix::DivMatrixNum(double *a, double b, double *c, int n, int m)
+HRESULT __stdcall CMatrix::MultMatrixNum(double b, double *c, int n, int m)
 {
-    return IM->DivMatrixNum(a, b, c, n, m);
+    return IM->MultMatrixNum(b, c, n, m);
 }
 
-HRESULT __stdcall CMatrix::DetMatrix(double *a, double *det, int n)
+HRESULT __stdcall CMatrix::DivMatrixNum(double b, double *c, int n, int m)
 {
-    return IM->DetMatrix(a, det, n);
+    return IM->DivMatrixNum(b, c, n, m);
+}
+
+HRESULT __stdcall CMatrix::DetMatrix(double *det, int n)
+{
+    return IM->DetMatrix(det, n);
 }
 
 CMatrix::~CMatrix()
@@ -85,7 +118,7 @@ CMatrixA::CMatrixA()
 
     IClassFactory *ICF = NULL;
 
-    HRESULT res = CoGetClassObject(Constants::CLSID_MATRIXA, CLSCTX_INPROC_SERVER, NULL, Constants::IID_IClassFactory, (void **)&ICF);
+    HRESULT res = CoGetClassObject(Constants::CLSID_MatrixAdvanced, CLSCTX_INPROC_SERVER, NULL, Constants::IID_IClassFactory, (void **)&ICF);
     // printf("%ul\n", GetLastError());
     if (res == E_NOTIMPL)
     {
@@ -105,7 +138,7 @@ CMatrixA::CMatrixA()
         throw EMatrix("Error while creating CMatrixA: Unsupported interface");
     }
 
-    res = ICF->CreateInstance(NULL, Constants::IID_IMatrixA, (void **)&IMA);
+    res = ICF->CreateInstance(NULL, Constants::IID_IMatrixAdvanced, (void **)&IMA);
     if (res == E_NOINTERFACE)
     {
         throw EMatrix("Error while creating CMatrixA: Unsupported interface");
@@ -113,49 +146,85 @@ CMatrixA::CMatrixA()
     ICF->Release();
 }
 
-HRESULT __stdcall CMatrixA::AddMatrixNum(double *a, double b, double *c, int n, int m)
+CMatrixA::CMatrixA(double *a, int n, int m)
 {
-    return IM->AddMatrixNum(a, b, c, n, m);
+    CoInitialize(NULL);
+
+    printf("Wrapper::GetClassObject\n");
+
+    IFactoryAdvanced *ICF = NULL;
+
+    HRESULT res = CoGetClassObject(Constants::CLSID_MatrixAdvanced, CLSCTX_INPROC_SERVER, NULL, Constants::IID_IFactoryAdvanced, (void **)&ICF);
+    // printf("%ul\n", GetLastError());
+    if (res == E_NOTIMPL)
+    {
+        throw EMatrix("Error while creating CMatrixA: Unsupported component");
+    }
+    else if (res == E_NOINTERFACE)
+    {
+        throw EMatrix("Error while creating CMatrixA: Unsupported interface");
+    }
+    else if (res != S_OK)
+    {
+        throw EMatrix("Error while creating CMatrixA: Unknown error");
+    }
+    res = ICF->CreateInstanceAdvanced(Constants::IID_IMatrixAdvanced, (void **)&IM, a, n, m);
+    if (res == E_NOINTERFACE)
+    {
+        throw EMatrix("Error while creating CMatrixA: Unsupported interface");
+    }
+
+    res = ICF->QueryInterface(Constants::IID_IMatrix, (void **)&IM);
+    if (res == E_NOINTERFACE)
+    {
+        throw EMatrix("Error while creating CMatrixA: Unsupported interface");
+    }
+    ICF->Release();
 }
 
-HRESULT __stdcall CMatrixA::SubMatrixNum(double *a, double b, double *c, int n, int m)
+HRESULT __stdcall CMatrixA::AddMatrixNum(double b, double *c, int n, int m)
 {
-    return IM->SubMatrixNum(a, b, c, n, m);
+    return IM->AddMatrixNum(b, c, n, m);
 }
 
-HRESULT __stdcall CMatrixA::MultMatrixNum(double *a, double b, double *c, int n, int m)
+HRESULT __stdcall CMatrixA::SubMatrixNum(double b, double *c, int n, int m)
 {
-    return IM->MultMatrixNum(a, b, c, n, m);
+    return IM->SubMatrixNum(b, c, n, m);
 }
 
-HRESULT __stdcall CMatrixA::DivMatrixNum(double *a, double b, double *c, int n, int m)
+HRESULT __stdcall CMatrixA::MultMatrixNum(double b, double *c, int n, int m)
 {
-    return IM->DivMatrixNum(a, b, c, n, m);
+    return IM->MultMatrixNum(b, c, n, m);
 }
 
-HRESULT __stdcall CMatrixA::DetMatrix(double *a, double *det, int n)
+HRESULT __stdcall CMatrixA::DivMatrixNum(double b, double *c, int n, int m)
 {
-    return IM->DetMatrix(a, det, n);
+    return IM->DivMatrixNum(b, c, n, m);
 }
 
-HRESULT __stdcall CMatrixA::AddMatrix(double *a, double *b, double *c, int n, int m)
+HRESULT __stdcall CMatrixA::DetMatrix(double *det, int n)
 {
-    return IMA->AddMatrix(a, b, c, n, m);
+    return IM->DetMatrix(det, n);
 }
 
-HRESULT __stdcall CMatrixA::MultMatrix(double *a, double *b, double *c, int n, int m, int p)
+HRESULT __stdcall CMatrixA::AddMatrix(double *b, double *c, int n, int m)
 {
-    return IMA->MultMatrix(a, b, c, n, m, p);
+    return IMA->AddMatrix(b, c, n, m);
 }
 
-HRESULT __stdcall CMatrixA::TransMatrix(double *a, double *b, int n)
+HRESULT __stdcall CMatrixA::MultMatrix(double *b, double *c, int n, int m, int p)
 {
-    return IMA->TransMatrix(a, b, n);
+    return IMA->MultMatrix(b, c, n, m, p);
 }
 
-HRESULT __stdcall CMatrixA::InverseMatrix(double *a, double *b, int n)
+HRESULT __stdcall CMatrixA::TransMatrix(double *b, int n)
 {
-    return IMA->InverseMatrix(a, b, n);
+    return IMA->TransMatrix(b, n);
+}
+
+HRESULT __stdcall CMatrixA::InverseMatrix(double *b, int n)
+{
+    return IMA->InverseMatrix(b, n);
 }
 
 CMatrixA::~CMatrixA()
