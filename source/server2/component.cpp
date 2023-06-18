@@ -40,6 +40,7 @@ Matrix::Matrix(double *a, int m, int n)
 Matrix::~Matrix()
 {
     cout << "Matrix::Destructor" << endl;
+    delete this->matrix;
 }
 
 HRESULT __stdcall Matrix::QueryInterface(const IID &iid, void **ppv)

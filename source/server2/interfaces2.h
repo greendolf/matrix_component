@@ -31,6 +31,7 @@ class IFactoryAdvanced : public IUnknown
 {
 public:
         virtual HRESULT __stdcall CreateInstance(const IID &iid, void **ppv) = 0;
+        virtual HRESULT __stdcall CreateInstanceAdvanced(const IID &iid, void **ppv, double *a, int n, int m) = 0;
 };
 
 #endif

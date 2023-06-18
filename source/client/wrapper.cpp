@@ -20,7 +20,7 @@ CMatrix::CMatrix()
 
     IClassFactory *ICF = NULL;
 
-    HRESULT res = CoGetClassObject(Constants::CLSID_MATRIX, CLSCTX_INPROC_SERVER, NULL, Constants::IID_IClassFactory, (void **)&ICF);
+    HRESULT res = CoGetClassObject(Constants::CLSID_Matrix, CLSCTX_INPROC_SERVER, NULL, Constants::IID_IClassFactory, (void **)&ICF);
     if (res == E_NOTIMPL)
     {
         throw EMatrix("Error while creating CMatrix: Unsupported component");
@@ -117,7 +117,7 @@ CMatrixA::CMatrixA()
 
     IClassFactory *ICF = NULL;
 
-    HRESULT res = CoGetClassObject(Constants::CLSID_MATRIXA, CLSCTX_INPROC_SERVER, NULL, Constants::IID_IClassFactory, (void **)&ICF);
+    HRESULT res = CoGetClassObject(Constants::CLSID_MatrixAdvanced, CLSCTX_INPROC_SERVER, NULL, Constants::IID_IClassFactory, (void **)&ICF);
     // printf("%ul\n", GetLastError());
     if (res == E_NOTIMPL)
     {
@@ -137,7 +137,7 @@ CMatrixA::CMatrixA()
         throw EMatrix("Error while creating CMatrixA: Unsupported interface");
     }
 
-    res = ICF->CreateInstance(NULL, Constants::IID_IMatrixA, (void **)&IMA);
+    res = ICF->CreateInstance(NULL, Constants::IID_IMatrixAdvanced, (void **)&IMA);
     if (res == E_NOINTERFACE)
     {
         throw EMatrix("Error while creating CMatrixA: Unsupported interface");

@@ -13,7 +13,7 @@ private:
 
 public:
 	MatrixAdvanced();
-	MatrixAdvanced(double *a, int m, int n);
+	MatrixAdvanced(double *a, int n, int m);
 	~MatrixAdvanced();
 
 	virtual HRESULT __stdcall QueryInterface(const IID &iid, void **ppv);
@@ -46,7 +46,7 @@ public:
 
 	virtual HRESULT __stdcall CreateInstance(IUnknown *pUnkOuter, const IID &iid, void **ppv);
 	virtual HRESULT __stdcall CreateInstance(const IID &iid, void **ppv);
-	virtual HRESULT __stdcall CreateInstanceAdvanced(const IID &iid, void **ppv, double* a, int m, int n);
+	virtual HRESULT __stdcall CreateInstanceAdvanced(const IID &iid, void **ppv, double *a, int n, int m);
 
 	virtual HRESULT __stdcall LockServer(BOOL fLock);
 };

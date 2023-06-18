@@ -2,23 +2,24 @@
 
 #include "interfaces.h"
 
-typedef HRESULT __stdcall (*FunctionType) (const CLSID& clsid, const IID& iid, void** ppv);
+// typedef HRESULT __stdcall (*FunctionType) (const CLSID& clsid, const IID& iid, void** ppv);
 
-class EMatrix {
-    private:
-        const char* msg;
-    public:
-        EMatrix(const char* msg);
-        const char* GetMessage();
+class EMatrix
+{
+private:
+    const char *msg;
+
+public:
+    EMatrix(const char *msg);
+    const char *GetMessage();
 };
 
-class CMatrix {
-    private:
-        IMatrix* IM;
-        HINSTANCE h;
-        CMatrix& operator=(const CMatrix&) {return *this;};
-    public:
-        CMatrix();
+class CMatrix
+{
+private:
+    IMatrix *IM;
+    HINSTANCE h;
+    CMatrix &operator=(const CMatrix &) { return *this; };
 
 public:
     CMatrix();
@@ -34,14 +35,13 @@ public:
     ~CMatrix();
 };
 
-class CMatrixA {
-    private:
-        IMatrix* IM;
-        IMatrixA* IMA;
-        HINSTANCE h;
-        CMatrixA& operator=(const CMatrixA&) {return *this;};
-    public:
-        CMatrixA();
+class CMatrixA
+{
+private:
+    IMatrix *IM;
+    IMatrixAdvanced *IMA;
+    HINSTANCE h;
+    CMatrixA &operator=(const CMatrixA &) { return *this; };
 
 public:
     CMatrixA();

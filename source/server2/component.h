@@ -43,6 +43,7 @@ public:
 	virtual ULONG __stdcall Release();
 
 	virtual HRESULT __stdcall CreateInstance(IUnknown *pUnkOuter, const IID &iid, void **ppv);
+
 	virtual HRESULT __stdcall CreateInstance(const IID &iid, void **ppv);
 	virtual HRESULT __stdcall CreateInstanceAdvanced(const IID &iid, void **ppv, double *a, int m, int n);
 

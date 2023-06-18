@@ -86,6 +86,7 @@ MatrixAdvanced::MatrixAdvanced(double *a, int n, int m)
 MatrixAdvanced::~MatrixAdvanced()
 {
     cout << "MatrixAdvanced::Destructor" << endl;
+    delete this->matrix;
 }
 
 HRESULT __stdcall MatrixAdvanced::QueryInterface(const IID &iid, void **ppv)
