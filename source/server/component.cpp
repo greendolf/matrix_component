@@ -34,7 +34,38 @@ MatrixAdvanced::MatrixAdvanced()
         printf("No factory\n");
     }
 
-    HRESULT resInstance = PCF->CreateInstance(NULL, Constants::IID_IMatrix, (void **)&ima);
+    HRESULT resInstance = PCF->CreateInstance(NULL, Constants::IID_IMatrix, (void **)&im);
+
+    if (!SUCCEEDED(resInstance))
+    {
+        printf("No instance\n");
+    }
+
+    this->matrix = new double;
+    this->im->SetMatrix(matrix, 0, 0);
+
+    PCF->Release();
+
+    CoUninitialize();
+}
+
+MatrixAdvanced::MatrixAdvanced(double *a, int n, int m)
+{
+    cout << "MatrixAdvanced::ConstructorAdvanced" << endl;
+    fRefCount = 0;
+
+    CoInitialize(NULL);
+
+    IFactoryAdvanced *PCF = NULL;
+
+    HRESULT resFactory = CoGetClassObject(Constants::CLSID_Matrix, CLSCTX_INPROC_SERVER, NULL, Constants::IID_IFactoryAdvanced, (void **)&PCF);
+
+    if (!SUCCEEDED(resFactory))
+    {
+        printf("No factory\n");
+    }
+
+    HRESULT resInstance = PCF->CreateInstanceAdvanced(Constants::IID_IMatrix, (void **)&im, a, m, n);
 
     if (!SUCCEEDED(resInstance))
     {
@@ -43,6 +74,12 @@ MatrixAdvanced::MatrixAdvanced()
 
     PCF->Release();
 
+    this->matrix = NULL;
+    printf("\n\n%p\n\n%p\n\n", (this->matrix), &(this->matrix));
+    this->n = n;
+    this->m = m;
+
+    im->GetMatrix(&(this->matrix), &(this->n), &(this->m));
     CoUninitialize();
 }
 
@@ -98,80 +135,110 @@ ULONG __stdcall MatrixAdvanced::Release()
     return fRefCount;
 }
 
-HRESULT __stdcall MatrixAdvanced::AddMatrixNum(double *a, double b, double *c, int n, int m)
+HRESULT __stdcall MatrixAdvanced::SetMatrix(double *a, int m, int n)
 {
-    printf("MatrixAdvanced::AddMatrixNum");
-    return ima->AddMatrixNum(a, b, c, n, m);;
+    return im->SetMatrix(a, m, n);
+}
+HRESULT __stdcall MatrixAdvanced::GetMatrix(double **a, int *m, int *n)
+{
+    return im->GetMatrix(a, m, n);
 }
 
-HRESULT __stdcall MatrixAdvanced::SubMatrixNum(double *a, double b, double *c, int n, int m)
-{
-    printf("MatrixAdvanced::SubMatrixNum");
-    return ima->AddMatrixNum(a, -b, c, n, m);;
-}
-
-HRESULT __stdcall MatrixAdvanced::MultMatrixNum(double *a, double b, double *c, int n, int m)
+HRESULT __stdcall MatrixAdvanced::MultMatrixNum(double b)
 {
     printf("MatrixAdvanced::MultMatrixNum");
-    return ima->MultMatrixNum(a, b, c, n, m);
+    return im->MultMatrixNum(b);
 }
 
-HRESULT __stdcall MatrixAdvanced::DivMatrixNum(double *a, double b, double *c, int n, int m)
+HRESULT __stdcall MatrixAdvanced::DivMatrixNum(double b)
 {
     printf("MatrixAdvanced::DivMatrixNum");
-    return ima->MultMatrixNum(a, 1/b, c, n, m);
+    return im->MultMatrixNum(1 / b);
 }
 
-HRESULT __stdcall MatrixAdvanced::DetMatrix(double *a, double *det, const int n)
+HRESULT __stdcall MatrixAdvanced::DetMatrix(double *det)
 {
     printf("MatrixAdvanced::DetMatrix");
-    return ima->DetMatrix(a, det, n);
+    return im->DetMatrix(det);
 }
 
-HRESULT __stdcall MatrixAdvanced::AddMatrix(double *a, double *b, double *c, int n, int m)
+HRESULT __stdcall MatrixAdvanced::AddMatrix(double *b)
 {
+    printf("MatrixAdvanced::AddMatrix");
     for (int i = 0; i < n; i++)
     {
         for (int j = 0; j < m; j++)
         {
-            c[i * m + j] = a[i * m + j] + b[i * m + j];
+            matrix[i * n + j] += b[i * n + j];
         }
     }
     return S_OK;
 }
 
-HRESULT __stdcall MatrixAdvanced::MultMatrix(double *a, double *b, double *c, int n, int m, int p)
+HRESULT __stdcall MatrixAdvanced::SubMatrix(double *b)
 {
-    for (int i = 0; i < n; i++)
-    {
-        for (int j = 0; j < p; j++)
-        {
-            c[i * p + j] = 0;
-            for (int k = 0; k < m; k++)
-            {
-                c[i * p + j] += a[i * m + k] * b[k * p + j];
-            }
-        }
-    }
-    return S_OK;
-}
-
-HRESULT __stdcall MatrixAdvanced::TransMatrix(double *a, double *b, int n)
-{
-    for (int i = 0; i < n; i++)
+    printf("MatrixAdvanced::SubMatrix");
+    for (int i = 0; i < m; i++)
     {
         for (int j = 0; j < n; j++)
         {
-            b[i * n + j] = a[j * n + i];
+            matrix[i * m + j] -= b[i * m + j];
         }
     }
     return S_OK;
 }
 
-HRESULT __stdcall MatrixAdvanced::InverseMatrix(double *a, double *b, int n)
+HRESULT __stdcall MatrixAdvanced::MultMatrix(double *b, int n2)
 {
-    double *det = new double();
-    MatrixAdvanced::DetMatrix(a, det, n);
+    double *temp = new double[m * n];
+    for (int i = 0; i < m; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
+            temp[i * m + j] = matrix[i * m + j];
+        }
+    }
+    delete[] matrix;
+    matrix = new double[m * n2];
+    for (int i = 0; i < m; i++)
+    {
+        for (int j = 0; j < n2; j++)
+        {
+            double sum = 0;
+            for (int k = 0; k < n; k++)
+            {
+                sum += temp[i * m + k] * b[k * m + j];
+            }
+            matrix[i * m + j] = sum;
+        }
+    }
+    return S_OK;
+}
+
+HRESULT __stdcall MatrixAdvanced::TransMatrix()
+{
+    double *temp = new double[m * n];
+    for (int i = 0; i < m; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
+            temp[i * m + j] = matrix[i * m + j];
+        }
+    }
+    for (int i = 0; i < m; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
+            this->matrix[i * n + j] = this->matrix[j * n + i];
+        }
+    }
+    return S_OK;
+}
+
+HRESULT __stdcall MatrixAdvanced::InverseMatrix()
+{
+    double *det = new double;
+    MatrixAdvanced::DetMatrix(det);
     if (*det != 0)
     {
         double temp;
@@ -183,7 +250,7 @@ HRESULT __stdcall MatrixAdvanced::InverseMatrix(double *a, double *b, int n)
             {
                 if (j < n)
                 {
-                    inverse[i][j] = a[i * n + j];
+                    inverse[i][j] = this->matrix[i * n + j];
                 }
                 else if (j == n + i)
                 {
@@ -233,7 +300,7 @@ HRESULT __stdcall MatrixAdvanced::InverseMatrix(double *a, double *b, int n)
         {
             for (int j = 0; j < n; j++)
             {
-                b[i * n + j] = inverse[i][j + n];
+                this->matrix[i * n + j] = inverse[i][j + n];
             }
         }
     }
@@ -304,6 +371,14 @@ HRESULT __stdcall FactoryAdvanced::CreateInstance(const IID &iid, void **ppv)
     // cout << "FactoryAdvanced::CreateInstance:" << ":" << iid << endl;
     IUnknown *obj = NULL;
     obj = (IUnknown *)(IMatrix *)new MatrixAdvanced();
+    return obj->QueryInterface(iid, ppv);
+}
+
+HRESULT __stdcall FactoryAdvanced::CreateInstanceAdvanced(const IID &iid, void **ppv, double *a, int m, int n)
+{
+    // cout << "FactoryAdvanced::CreateInstanceAdvanced:" << ":" << iid << endl;
+    IUnknown *obj = NULL;
+    obj = (IUnknown *)(IMatrix *)new MatrixAdvanced(a, m, n);
     return obj->QueryInterface(iid, ppv);
 }
 

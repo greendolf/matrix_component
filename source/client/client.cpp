@@ -18,42 +18,46 @@ CLSID Constants::CLSID_MATRIXA = {0xD7C3EE79, 0xC27E, 0x4BAE, {0x95, 0xC6, 0x08,
 
 IID Constants::IID_IDispatch = {0x00020400, 0x0000, 0x0000, {0xC0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x46}};
 
-void show(double *a, int n, int m);
+void show(double *a, int m, int n);
 
 int main()
 {
     cout << "CLIENT MAIN START" << endl;
-
-    int n = 3;
-    double *test = new double[n * n]{1, 10, 3, 2, 5, 7, 3, 7, 9};
+    int m, n;
+    double *test = new double[3 * 3]{1, 10, 3, 2, 5, 7, 3, 7, 9};
+    double *test2 = new double[3 * 3];
     try
     {
-        CMatrixA CMA;
-        cout << "CMATRIX CREATE SUCCESS" << endl;
-        double *det = new double();
-        HRESULT res = CMA.DetMatrix(test, det, n);
+        CMatrixA *CMA = new CMatrixA(test, 3, 3);
+        cout << "CMATRIXA CREATE SUCCESS" << endl;
+        double *det = new double;
+        HRESULT res = CMA->DetMatrix(det);
         if (res == S_OK)
         {
             cout << "Det M = " << *det << endl;
         };
-
-        double *test2 = new double[n * n];
-        res = CMA.InverseMatrix(test, test2, n);
+        res = CMA->MultMatrixNum(5);
+        CMA->GetMatrix(&test2, &m, &n);
         if (res == S_OK)
         {
             cout << endl
                  << "M:" << endl;
             show(test, n, n);
-            cout << "\nInv M:" << endl;
+            cout << "\n5M:" << endl;
             show(test2, n, n);
         }
-
-        res = CMA.TransMatrix(test, test2, n);
+        CMA->GetMatrix(&test, NULL, NULL);
+        show(test, n, n);
+        cout << endl << "multiple by" << endl;
+        show(test2, n, n);
+        res = CMA->MultMatrix(test2, 3);
+        CMA->GetMatrix(&test, NULL, NULL);
         if (res == S_OK)
         {
-            cout << endl
-                 << "Trans M: " << endl;
             show(test2, n, n);
+            cout << endl
+                 << "Mult M: " << endl;
+            show(test, n, n);
         }
         cin.get();
         printf("%s\n", "CLIENT FINISH");
@@ -65,11 +69,11 @@ int main()
     return 0;
 }
 
-void show(double *a, int n, int m)
+void show(double *a, int m, int n)
 {
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < m; i++)
     {
-        for (int j = 0; j < m; j++)
+        for (int j = 0; j < n; j++)
         {
             cout << setw(12) << a[i * m + j] << " | ";
         }

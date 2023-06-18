@@ -18,6 +18,23 @@ Matrix::Matrix()
 {
     cout << "Matrix::Constructor" << endl;
     fRefCount = 0;
+    this->matrix = new double;
+}
+
+Matrix::Matrix(double *a, int m, int n)
+{
+    printf("Matrix::ConstructorAdvanced \t m = %i, n = %i\n", m, n);
+    this->matrix = new double[m * n];
+    fRefCount = 0;
+    for (int i = 0; i < m; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
+            this->matrix[i * m + j] = a[i * m + j];
+        }
+    }
+    this->n = n;
+    this->m = m;
 }
 
 Matrix::~Matrix()
@@ -27,6 +44,7 @@ Matrix::~Matrix()
 
 HRESULT __stdcall Matrix::QueryInterface(const IID &iid, void **ppv)
 {
+    printf("Matrix::QueryInterface\n");
     // cout << "Matrix::QueryInterface:" << iid << endl;
 
     if (iid == Constants::IID_IUnknown)
@@ -53,17 +71,15 @@ HRESULT __stdcall Matrix::QueryInterface(const IID &iid, void **ppv)
 
 ULONG __stdcall Matrix::AddRef()
 {
-    cout << "Matrix::AddRef" << endl;
     fRefCount++;
-    cout << "Current references: " << fRefCount << endl;
+    printf("Matrix::AddRef\tCurrent: %i\n", fRefCount);
     return fRefCount;
 }
 
 ULONG __stdcall Matrix::Release()
 {
-    cout << "Matrix::Release" << endl;
     fRefCount--;
-    cout << "Current references: " << fRefCount << endl;
+    printf("Matrix::Release\tCurrent: %i\n", fRefCount);
     if (fRefCount <= 0)
     {
         cout << "Self-destructing..." << endl;
@@ -73,71 +89,88 @@ ULONG __stdcall Matrix::Release()
     return fRefCount;
 }
 
-HRESULT __stdcall Matrix::AddMatrixNum(double *a, double b, double *c, int n, int m)
+HRESULT __stdcall Matrix::SetMatrix(double *a, int m, int n)
 {
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < m; i++)
     {
         for (int j = 0; j < n; j++)
         {
-            c[i * m + j] = a[i * m + j] + b;
+            this->matrix[i * m + j] = a[i * m + j];
+        }
+    }
+    return S_OK;
+}
+HRESULT __stdcall Matrix::GetMatrix(double **a, int *m, int *n)
+{
+    printf("Matrix::GetMatrix\tm = %i, n = %i\n", this->m, this->n);
+    printf("%p\n", *a);
+    double *output = new double[this->m * this->n];
+    for (int i = 0; i < this->m; i++)
+    {
+        for (int j = 0; j < this->n; j++)
+        {
+            printf("i = %i, j = %i\n", i, j);
+            //printf("(*a)[%i * %i + %i] = %f", i, this->m, j, (*a)[i * this->m + j]);
+            //(*a)[i * this->m + j] = matrix[i * this->m + j];
+        }
+    }
+    if (m && n)
+    {
+        *m = this->m;
+        *n = this->n;
+    }
+
+    return S_OK;
+}
+
+HRESULT __stdcall Matrix::MultMatrixNum(double b)
+{
+    for (int i = 0; i < m; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
+            this->matrix[i * m + j] = this->matrix[i * m + j] * b;
         }
     }
     return S_OK;
 }
 
-HRESULT __stdcall Matrix::SubMatrixNum(double *a, double b, double *c, int n, int m)
+HRESULT __stdcall Matrix::DivMatrixNum(double b)
 {
-    return Matrix::AddMatrixNum(a, -b, c, n, m);
+    return Matrix::MultMatrixNum(1 / b);
 }
 
-HRESULT __stdcall Matrix::MultMatrixNum(double *a, double b, double *c, int n, int m)
+HRESULT __stdcall Matrix::DetMatrix(double *det)
 {
-    for (int i = 0; i < n; i++)
-    {
-        for (int j = 0; j < n; j++)
-        {
-            c[i * m + j] = a[i * m + j] * b;
-        }
-    }
-    return S_OK;
-}
-
-HRESULT __stdcall Matrix::DivMatrixNum(double *a, double b, double *c, int n, int m)
-{
-    return Matrix::MultMatrixNum(a, 1 / b, c, n, m);
-}
-
-HRESULT __stdcall Matrix::DetMatrix(double *a, double *det, int n)
-{
-    cout << "Matrix::DetMatrix" << endl;
+    printf("Matrix::DetMatrix\n");
     double epsilon = 0.0000000001;
     double d = 1.0;
     double tmp;
-    double matrix[n][n];
+    double *temp = new double[n * n];
 
     for (int i = 0; i < n; i++)
     {
         for (int j = 0; j < n; j++)
         {
-            matrix[i][j] = a[i * n + j];
+            temp[i * n + j] = matrix[i * n + j];
         }
     }
     for (int i = 0; i < n; i++)
     {
         for (int j = i + 1; j < n; j++)
         {
-            while (fabs(matrix[j][i]) > epsilon)
+            while (fabs(temp[j * n + i]) > epsilon)
             {
-                tmp = matrix[i][i] / matrix[j][i];
+                tmp = temp[i * n + i] / temp[j * n + i];
                 for (int k = 0; k < n; k++)
                 {
-                    matrix[i][k] -= tmp * matrix[j][k];
-                    swap(matrix[i][k], matrix[j][k]);
+                    temp[i * n + k] -= tmp * temp[j * n + k];
+                    swap(temp[i * n + k], matrix[j * n + k]);
                 }
                 d = -d;
             }
         }
-        d *= matrix[i][i];
+        d *= temp[i * n + i];
     }
     *det = d;
     return S_OK;
@@ -152,29 +185,24 @@ HRESULT __stdcall Matrix::GetIDsOfNames(REFIID riid, LPOLESTR *rgszNames, UINT c
         return E_NOTIMPL;
     }
 
-    if (wcscmp(rgszNames[0], L"AddMatrixNum") == 0)
+    if (wcscmp(rgszNames[0], L"MultMatrixNum") == 0)
     {
         rgDispId[0] = 1;
     }
 
-    else if (wcscmp(rgszNames[0], L"SubMatrixNum") == 0)
+    else if (wcscmp(rgszNames[0], L"DivMatrixNum") == 0)
     {
         rgDispId[0] = 2;
     }
 
-    else if (wcscmp(rgszNames[0], L"MultMatrixNum") == 0)
+    else if (wcscmp(rgszNames[0], L"DetMatrix") == 0)
     {
         rgDispId[0] = 3;
     }
 
-    else if (wcscmp(rgszNames[0], L"DivMatrixNum") == 0)
+    else if (wcscmp(rgszNames[0], L"AddOne") == 0)
     {
         rgDispId[0] = 4;
-    }
-
-    else if (wcscmp(rgszNames[0], L"DetMatrix") == 0)
-    {
-        rgDispId[0] = 5;
     }
 
     else
@@ -202,10 +230,8 @@ HRESULT __stdcall Matrix::Invoke(DISPID dispIdMember, REFIID riid, LCID lcid, WO
     else if (dispIdMember == 4)
     {
         printf("Matrix::Invoke::4");
-    }
-    else if (dispIdMember == 5)
-    {
-        printf("Matrix::Invoke::5");
+        DISPPARAMS param = *pDispParams;
+        VARIANT arg = (param.rgvarg)[0];
     }
     else
     {
@@ -252,28 +278,26 @@ HRESULT __stdcall Factory::QueryInterface(const IID &iid, void **ppv)
 
 ULONG __stdcall Factory::AddRef()
 {
-    cout << "Factory::AddRef" << endl;
     fRefCount++;
-    cout << "Current references: " << fRefCount << endl;
+    printf("Factory::AddRef\tCurrent: %i\n", fRefCount);
     return fRefCount;
 }
 
 ULONG __stdcall Factory::Release()
 {
-    cout << "Factory::Release" << endl;
     fRefCount--;
-    cout << "Current references: " << fRefCount << endl;
+    printf("Factory::Release\tCurrent: %i\n", fRefCount);
     if (fRefCount == 0)
     {
-        cout << "Self-destructing..." << endl;
+        cout << "Factory self-destructing" << endl;
         delete this;
-        cout << "Self-destructing...OK" << endl;
     }
     return fRefCount;
 }
 
 HRESULT __stdcall Factory::CreateInstance(IUnknown *pIUnknownOuter, const IID &iid, void **ppv)
 {
+    printf("Factory::CreateInstance:%i\n", iid);
     // cout << "Factory::CreateInstance:" << ":" << iid << endl;
     IUnknown *obj = NULL;
     obj = (IUnknown *)(IMatrix *)new Matrix();
@@ -286,9 +310,23 @@ HRESULT __stdcall Factory::CreateInstance(IUnknown *pIUnknownOuter, const IID &i
 
 HRESULT __stdcall Factory::CreateInstance(const IID &iid, void **ppv)
 {
+    printf("Factory::CreateInstance:%i\n", iid);
     // cout << "Factory::CreateInstance:" << ":" << iid << endl;
     IUnknown *obj = NULL;
     obj = (IUnknown *)(IMatrix *)new Matrix();
+    if (obj == NULL)
+    {
+        return E_OUTOFMEMORY;
+    }
+    return obj->QueryInterface(iid, ppv);
+}
+
+HRESULT __stdcall Factory::CreateInstanceAdvanced(const IID &iid, void **ppv, double *a, int m, int n)
+{
+    printf("Factory::CreateInstanceAdvanced:%i:%i\n", m, n);
+    // cout << "Factory::CreateInstanceAdvanced:" << ":" << iid << endl;
+    IUnknown *obj = NULL;
+    obj = (IUnknown *)(IMatrix *)new Matrix(a, m, n);
     if (obj == NULL)
     {
         return E_OUTOFMEMORY;

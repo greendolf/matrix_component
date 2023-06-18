@@ -26,15 +26,22 @@ public:
         virtual HRESULT __stdcall MultMatrixNum(double *a, double b, double *c, int n, int m) = 0;
         virtual HRESULT __stdcall DivMatrixNum(double *a, double b, double *c, int n, int m) = 0;
         virtual HRESULT __stdcall DetMatrix(double *a, double *det, int n) = 0;
+        virtual HRESULT __stdcall SetMatrix(double *a, int m, int n) = 0;
+        virtual HRESULT __stdcall GetMatrix(double **a, int *m, int *n) = 0;
+
+        virtual HRESULT __stdcall MultMatrixNum(double b) = 0;
+        virtual HRESULT __stdcall DivMatrixNum(double b) = 0;
+        virtual HRESULT __stdcall DetMatrix(double *det) = 0;
 };
 
 class IMatrixAdvanced : public IUnknown
 {
 public:
-        virtual HRESULT __stdcall AddMatrix(double *a, double *b, double *c, int n, int m) = 0;
-        virtual HRESULT __stdcall MultMatrix(double *a, double *b, double *c, int n, int m, int p) = 0;
-        virtual HRESULT __stdcall TransMatrix(double *a, double *b, int n) = 0;
-        virtual HRESULT __stdcall InverseMatrix(double *a, double *b, int n) = 0;
+        virtual HRESULT __stdcall AddMatrix(double *b) = 0;
+        virtual HRESULT __stdcall SubMatrix(double *b) = 0;
+        virtual HRESULT __stdcall MultMatrix(double *b, int p) = 0;
+        virtual HRESULT __stdcall TransMatrix() = 0;
+        virtual HRESULT __stdcall InverseMatrix() = 0;
 };
 
 class IFactoryAdvanced : public IUnknown

@@ -10,7 +10,7 @@ g++ -c .\source\server2\container.cpp -o .\build\server2\container.o
 g++ -shared .\build\server2\container.o .\build\server2\component.o -o .\build\server2\component2.dll -Wl,--kill-at -lole32 -loleaut32 -luser32
 
 
-xcopy .\source\server\interfaces.h  .\build\client /Y
+xcopy .\source\server\interfaces.h  .\source\client /Y
 
 
 g++ -c ./source/client/client.cpp  -o ./build/client/client.o

@@ -20,13 +20,18 @@ class CMatrix {
     public:
         CMatrix();
 
-		virtual HRESULT __stdcall AddMatrixNum(double *a, double b, double *c, int n, int m);
-        virtual HRESULT __stdcall SubMatrixNum(double *a, double b, double *c, int n, int m);
-        virtual HRESULT __stdcall MultMatrixNum(double *a, double b, double *c, int n, int m);
-        virtual HRESULT __stdcall DivMatrixNum(double *a, double b, double *c, int n, int m);
-        virtual HRESULT __stdcall DetMatrix(double *a, double *det, int n);
+public:
+    CMatrix();
+    CMatrix(double *a, int m, int n);
 
-        ~CMatrix();
+    virtual HRESULT __stdcall SetMatrix(double *a, int m, int n);
+    virtual HRESULT __stdcall GetMatrix(double **a, int *m, int *n);
+
+    virtual HRESULT __stdcall MultMatrixNum(double b);
+    virtual HRESULT __stdcall DivMatrixNum(double b);
+    virtual HRESULT __stdcall DetMatrix(double *det);
+
+    ~CMatrix();
 };
 
 class CMatrixA {
@@ -38,16 +43,21 @@ class CMatrixA {
     public:
         CMatrixA();
 
-        virtual HRESULT __stdcall AddMatrixNum(double *a, double b, double *c, int n, int m);
-        virtual HRESULT __stdcall SubMatrixNum(double *a, double b, double *c, int n, int m);
-        virtual HRESULT __stdcall MultMatrixNum(double *a, double b, double *c, int n, int m);
-        virtual HRESULT __stdcall DivMatrixNum(double *a, double b, double *c, int n, int m);
-        virtual HRESULT __stdcall DetMatrix(double *a, double *det, int n);
+public:
+    CMatrixA();
+    CMatrixA(double *a, int m, int n);
 
-        virtual HRESULT __stdcall AddMatrix(double *a, double *b, double *c, int n, int m);
-        virtual HRESULT __stdcall MultMatrix(double *a, double *b, double *c, int n, int m, int p);
-		virtual HRESULT __stdcall TransMatrix(double *a, double *b, int n);
-		virtual HRESULT __stdcall InverseMatrix(double *a, double *b, int n);
+    virtual HRESULT __stdcall SetMatrix(double *a, int m, int n);
+    virtual HRESULT __stdcall GetMatrix(double **a, int *m, int *n);
 
-        ~CMatrixA();
+    virtual HRESULT __stdcall MultMatrixNum(double b);
+    virtual HRESULT __stdcall DivMatrixNum(double b);
+    virtual HRESULT __stdcall DetMatrix(double *det);
+
+    virtual HRESULT __stdcall AddMatrix(double *b);
+    virtual HRESULT __stdcall MultMatrix(double *b, int p);
+    virtual HRESULT __stdcall TransMatrix();
+    virtual HRESULT __stdcall InverseMatrix();
+
+    ~CMatrixA();
 };

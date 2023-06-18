@@ -7,26 +7,31 @@ class MatrixAdvanced : public IMatrix, IMatrixAdvanced
 {
 private:
 	int fRefCount;
-	IMatrix *ima;
+	IMatrix *im;
+	double *matrix;
+	int n, m;
 
 public:
 	MatrixAdvanced();
+	MatrixAdvanced(double *a, int m, int n);
 	~MatrixAdvanced();
 
 	virtual HRESULT __stdcall QueryInterface(const IID &iid, void **ppv);
 	virtual ULONG __stdcall AddRef();
 	virtual ULONG __stdcall Release();
 
-	virtual HRESULT __stdcall AddMatrixNum(double *a, double b, double *c, int n, int m);
-	virtual HRESULT __stdcall SubMatrixNum(double *a, double b, double *c, int n, int m);
-	virtual HRESULT __stdcall MultMatrixNum(double *a, double b, double *c, int n, int m);
-	virtual HRESULT __stdcall DivMatrixNum(double *a, double b, double *c, int n, int m);
-	virtual HRESULT __stdcall DetMatrix(double *a, double *det, int n);
+	virtual HRESULT __stdcall SetMatrix(double *a, int m, int n);
+	virtual HRESULT __stdcall GetMatrix(double **a, int *m, int *n);
 
-	virtual HRESULT __stdcall AddMatrix(double *a, double *b, double *c, int n, int m);
-	virtual HRESULT __stdcall MultMatrix(double *a, double *b, double *c, int n, int m, int p);
-	virtual HRESULT __stdcall TransMatrix(double *a, double *b, int n);
-	virtual HRESULT __stdcall InverseMatrix(double *a, double *b, int n);
+	virtual HRESULT __stdcall MultMatrixNum(double b);
+	virtual HRESULT __stdcall DivMatrixNum(double b);
+	virtual HRESULT __stdcall DetMatrix(double *det);
+
+	virtual HRESULT __stdcall AddMatrix(double *b);
+	virtual HRESULT __stdcall SubMatrix(double *b);
+	virtual HRESULT __stdcall MultMatrix(double *b, int p);
+	virtual HRESULT __stdcall TransMatrix();
+	virtual HRESULT __stdcall InverseMatrix();
 };
 
 class FactoryAdvanced : public IClassFactory, IFactoryAdvanced
@@ -41,6 +46,7 @@ public:
 
 	virtual HRESULT __stdcall CreateInstance(IUnknown *pUnkOuter, const IID &iid, void **ppv);
 	virtual HRESULT __stdcall CreateInstance(const IID &iid, void **ppv);
+	virtual HRESULT __stdcall CreateInstanceAdvanced(const IID &iid, void **ppv, double* a, int m, int n);
 
 	virtual HRESULT __stdcall LockServer(BOOL fLock);
 };
