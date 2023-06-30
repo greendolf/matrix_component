@@ -41,15 +41,15 @@ MatrixAdvanced::MatrixAdvanced()
         printf("No instance\n");
     }
 
-    this->matrix = new double;
-    this->im->SetMatrix(matrix, 0, 0);
+    // this->matrix = new double;
+    // this->im->SetMatrix(matrix, 0, 0);
 
     PCF->Release();
 
     CoUninitialize();
 }
 
-MatrixAdvanced::MatrixAdvanced(double *a, int n, int m)
+MatrixAdvanced::MatrixAdvanced(double *a, int m, int n)
 {
     cout << "MatrixAdvanced::ConstructorAdvanced" << endl;
     fRefCount = 0;
@@ -65,7 +65,14 @@ MatrixAdvanced::MatrixAdvanced(double *a, int n, int m)
         printf("No factory\n");
     }
 
-    HRESULT resInstance = PCF->CreateInstanceAdvanced(Constants::IID_IMatrix, (void **)&im, a, m, n);
+    matrix = new double[m * n];
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < n; j++) {
+            matrix[i * m + j] = a[i * m + j];
+        }
+    }
+
+    HRESULT resInstance = PCF->CreateInstanceAdvanced(Constants::IID_IMatrix, (void **)&im, matrix, m, n);
 
     if (!SUCCEEDED(resInstance))
     {
@@ -74,12 +81,11 @@ MatrixAdvanced::MatrixAdvanced(double *a, int n, int m)
 
     PCF->Release();
 
-    this->matrix = NULL;
     printf("\n\n%p\n\n%p\n\n", (this->matrix), &(this->matrix));
     this->n = n;
     this->m = m;
 
-    im->GetMatrix(&(this->matrix), &(this->n), &(this->m));
+    //im->GetMatrix(&(this->matrix), &(this->n), &(this->m));
     CoUninitialize();
 }
 
@@ -116,29 +122,33 @@ HRESULT __stdcall MatrixAdvanced::QueryInterface(const IID &iid, void **ppv)
 
 ULONG __stdcall MatrixAdvanced::AddRef()
 {
-    cout << "MatrixAdvanced::AddRef" << endl;
     fRefCount++;
-    cout << "Current references: " << fRefCount << endl;
+    printf("MatrixAdvanced::AddRef\tCurrent: %i\n", fRefCount);
     return fRefCount;
 }
 
 ULONG __stdcall MatrixAdvanced::Release()
 {
-    cout << "MatrixAdvanced::Release" << endl;
     fRefCount--;
-    cout << "Current references: " << fRefCount << endl;
+    printf("MatrixAdvanced::Release\tCurrent: %i\n", fRefCount);
     if (fRefCount <= 0)
     {
-        cout << "Self-destructing..." << endl;
+        cout << "MatrixAdvanced::Self-destructing" << endl;
         delete this;
-        cout << "Self-destructing...OK" << endl;
     }
     return fRefCount;
 }
 
 HRESULT __stdcall MatrixAdvanced::SetMatrix(double *a, int m, int n)
 {
-    return im->SetMatrix(a, m, n);
+    delete[] matrix;
+    matrix = new double[m * n];
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < n; j++) {
+            matrix[i * m + j] = a[i * m + j];
+        }
+    }
+    return im->SetMatrix(matrix, m, n);
 }
 HRESULT __stdcall MatrixAdvanced::GetMatrix(double **a, int *m, int *n)
 {
@@ -147,25 +157,25 @@ HRESULT __stdcall MatrixAdvanced::GetMatrix(double **a, int *m, int *n)
 
 HRESULT __stdcall MatrixAdvanced::MultMatrixNum(double b)
 {
-    printf("MatrixAdvanced::MultMatrixNum");
+    printf("MatrixAdvanced::MultMatrixNum\n");
     return im->MultMatrixNum(b);
 }
 
 HRESULT __stdcall MatrixAdvanced::DivMatrixNum(double b)
 {
-    printf("MatrixAdvanced::DivMatrixNum");
+    printf("MatrixAdvanced::DivMatrixNum\n");
     return im->MultMatrixNum(1 / b);
 }
 
 HRESULT __stdcall MatrixAdvanced::DetMatrix(double *det)
 {
-    printf("MatrixAdvanced::DetMatrix");
+    printf("MatrixAdvanced::DetMatrix\n");
     return im->DetMatrix(det);
 }
 
 HRESULT __stdcall MatrixAdvanced::AddMatrix(double *b)
 {
-    printf("MatrixAdvanced::AddMatrix");
+    printf("MatrixAdvanced::AddMatrix\n");
     for (int i = 0; i < n; i++)
     {
         for (int j = 0; j < m; j++)
@@ -213,6 +223,7 @@ HRESULT __stdcall MatrixAdvanced::MultMatrix(double *b, int n2)
             matrix[i * m + j] = sum;
         }
     }
+    im->SetMatrix(matrix, m, n2);
     return S_OK;
 }
 
@@ -230,7 +241,7 @@ HRESULT __stdcall MatrixAdvanced::TransMatrix()
     {
         for (int j = 0; j < n; j++)
         {
-            this->matrix[i * n + j] = this->matrix[j * n + i];
+            this->matrix[i * n + j] = temp[j * n + i];
         }
     }
     return S_OK;
@@ -243,15 +254,15 @@ HRESULT __stdcall MatrixAdvanced::InverseMatrix()
     if (*det != 0)
     {
         double temp;
-        double inverse[n][n * 2];
+        double inverse[m][n * 2];
         // добавление единичной матрицы
-        for (int i = 0; i < n; i++)
+        for (int i = 0; i < m; i++)
         {
             for (int j = 0; j < n * 2; j++)
             {
                 if (j < n)
                 {
-                    inverse[i][j] = this->matrix[i * n + j];
+                    inverse[i][j] = matrix[i * n + j];
                 }
                 else if (j == n + i)
                 {

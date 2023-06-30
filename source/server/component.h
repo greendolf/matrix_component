@@ -29,7 +29,7 @@ public:
 
 	virtual HRESULT __stdcall AddMatrix(double *b);
 	virtual HRESULT __stdcall SubMatrix(double *b);
-	virtual HRESULT __stdcall MultMatrix(double *b, int p);
+	virtual HRESULT __stdcall MultMatrix(double *b, int n2);
 	virtual HRESULT __stdcall TransMatrix();
 	virtual HRESULT __stdcall InverseMatrix();
 };
@@ -46,7 +46,7 @@ public:
 
 	virtual HRESULT __stdcall CreateInstance(IUnknown *pUnkOuter, const IID &iid, void **ppv);
 	virtual HRESULT __stdcall CreateInstance(const IID &iid, void **ppv);
-	virtual HRESULT __stdcall CreateInstanceAdvanced(const IID &iid, void **ppv, double *a, int n, int m);
+	virtual HRESULT __stdcall CreateInstanceAdvanced(const IID &iid, void **ppv, double *a, int m, int n);
 
 	virtual HRESULT __stdcall LockServer(BOOL fLock);
 };

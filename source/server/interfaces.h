@@ -34,7 +34,7 @@ class IMatrixAdvanced : public IUnknown
 public:
         virtual HRESULT __stdcall AddMatrix(double *b) = 0;
         virtual HRESULT __stdcall SubMatrix(double *b) = 0;
-        virtual HRESULT __stdcall MultMatrix(double *b, int p) = 0;
+        virtual HRESULT __stdcall MultMatrix(double *b, int n2) = 0;
         virtual HRESULT __stdcall TransMatrix() = 0;
         virtual HRESULT __stdcall InverseMatrix() = 0;
 };

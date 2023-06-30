@@ -1,11 +1,25 @@
 dim app
 set app = CreateObject("KKE.Application")
+dim array(9), index, s
+array(0) = 1
+array(1) = 10
+array(2) = 3
+array(3) = 2
+array(4) = 5
+array(5) = 7
+array(6) = 3
+array(7) = 7
+array(8) = 9
 
-Wscript.Echo app.AddMatrixNum
+' array = Array(1,10,3,2,5,7,3,7,9)
 
-dim test_matrix1(2,2)
-dim test_matrix2(2,2)
+' for each index in array
+'      Wscript.Echo index
+' next
+ 
+' MsgBox s
 
-app.AddMatrixNum(0)
+' Call app.SetMatrix(1, 10, 3, 2, 5, 7, 3, 7, 9, 3, 3)
 
-Wscript.Echo test_matrix2(1,1)
+Call app.SetMatrixByNum(3, 3, 9)
+

@@ -23,41 +23,60 @@ void show(double *a, int m, int n);
 int main()
 {
     cout << "CLIENT MAIN START" << endl;
-    int m, n;
-    double *test = new double[3 * 3]{1, 10, 3, 2, 5, 7, 3, 7, 9};
-    double *test2 = new double[3 * 3];
+    int m = 3, n = 3;
+    double *M = new double[m * n]{1, 10, 3, 2, 5, 7, 3, 7, 9};
     try
     {
-        CMatrixA *CMA = new CMatrixA(test, 3, 3);
+        CMatrixA *CMA = new CMatrixA(M, 3, 3);
         cout << "CMATRIXA CREATE SUCCESS" << endl;
         double *det = new double;
         HRESULT res = CMA->DetMatrix(det);
         if (res == S_OK)
         {
-            cout << "Det M = " << *det << endl;
+            printf("Det M = %.2f\n", *det);
         };
         res = CMA->MultMatrixNum(5);
-        CMA->GetMatrix(&test2, &m, &n);
         if (res == S_OK)
         {
-            cout << endl
-                 << "M:" << endl;
-            show(test, n, n);
-            cout << "\n5M:" << endl;
-            show(test2, n, n);
+            printf("M:\n");
+            show(M, m, n);
+            double *M5 = NULL;
+            CMA->GetMatrix(&M5, &m, &n);
+            cout << "M * 5:" << endl;
+            show(M5, m, n);
         }
-        CMA->GetMatrix(&test, NULL, NULL);
-        show(test, n, n);
-        cout << endl << "multiple by" << endl;
-        show(test2, n, n);
-        res = CMA->MultMatrix(test2, 3);
-        CMA->GetMatrix(&test, NULL, NULL);
+        CMA->SetMatrix(M, m, n);
+        res = CMA->MultMatrix(M, n);
         if (res == S_OK)
         {
-            show(test2, n, n);
-            cout << endl
-                 << "Mult M: " << endl;
-            show(test, n, n);
+            printf("M:\n");
+            show(M, n, n);
+            double *mulRes = NULL;
+            CMA->GetMatrix(&mulRes, NULL, NULL);
+            printf("M * M:\n");
+            show(mulRes, n, n);
+        }
+        CMA->SetMatrix(M, m, n);
+        res = CMA->TransMatrix();
+        if (res == S_OK)
+        {
+            printf("M:\n");
+            show(M, n, n);
+            double *transRes = NULL;
+            CMA->GetMatrix(&transRes, NULL, NULL);
+            printf("Trans M:\n");
+            show(transRes, m, n);
+        }
+        CMA->SetMatrix(M, m, n);
+        res = CMA->InverseMatrix();
+        if (res == S_OK)
+        {
+            printf("M:\n");
+            show(M, n, n);
+            double *invRes = NULL;
+            CMA->GetMatrix(&invRes, NULL, NULL);
+            printf("Inverse M:\n");
+            show(invRes, m, n);
         }
         cin.get();
         printf("%s\n", "CLIENT FINISH");
@@ -79,4 +98,5 @@ void show(double *a, int m, int n)
         }
         cout << endl;
     }
+    cout << endl;
 }

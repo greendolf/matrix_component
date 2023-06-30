@@ -18,23 +18,22 @@ Matrix::Matrix()
 {
     cout << "Matrix::Constructor" << endl;
     fRefCount = 0;
-    this->matrix = new double;
 }
 
 Matrix::Matrix(double *a, int m, int n)
 {
     printf("Matrix::ConstructorAdvanced \t m = %i, n = %i\n", m, n);
-    this->matrix = new double[m * n];
     fRefCount = 0;
-    for (int i = 0; i < m; i++)
-    {
-        for (int j = 0; j < n; j++)
-        {
-            this->matrix[i * m + j] = a[i * m + j];
-        }
-    }
-    this->n = n;
+    // for (int i = 0; i < m; i++)
+    // {
+    //     for (int j = 0; j < n; j++)
+    //     {
+    //         this->matrix[i * m + j] = a[i * m + j];
+    //     }
+    // }
+    this->matrix = a;
     this->m = m;
+    this->n = n;
 }
 
 Matrix::~Matrix()
@@ -83,38 +82,36 @@ ULONG __stdcall Matrix::Release()
     printf("Matrix::Release\tCurrent: %i\n", fRefCount);
     if (fRefCount <= 0)
     {
-        cout << "Self-destructing..." << endl;
+        cout << "Matrix::Self-destructing" << endl;
         delete this;
-        cout << "Self-destructing...OK" << endl;
     }
     return fRefCount;
 }
 
 HRESULT __stdcall Matrix::SetMatrix(double *a, int m, int n)
 {
-    for (int i = 0; i < m; i++)
-    {
-        for (int j = 0; j < n; j++)
-        {
-            this->matrix[i * m + j] = a[i * m + j];
-        }
-    }
+    this->matrix = a;
+    // for (int i = 0; i < m; i++)
+    // {
+    //     for (int j = 0; j < n; j++)
+    //     {
+    //         this->matrix[i * m + j] = a[i * m + j];
+    //     }
+    // }
     return S_OK;
 }
 HRESULT __stdcall Matrix::GetMatrix(double **a, int *m, int *n)
 {
-    printf("Matrix::GetMatrix\tm = %i, n = %i\n", this->m, this->n);
-    printf("%p\n", *a);
-    double *output = new double[this->m * this->n];
+    *a = new double[this->m * this->n];
     for (int i = 0; i < this->m; i++)
     {
         for (int j = 0; j < this->n; j++)
         {
-            printf("i = %i, j = %i\n", i, j);
-            //printf("(*a)[%i * %i + %i] = %f", i, this->m, j, (*a)[i * this->m + j]);
-            //(*a)[i * this->m + j] = matrix[i * this->m + j];
+            (*a)[i * this->m + j] = matrix[i * this->m + j];
         }
     }
+
+    //*a = this->matrix;
     if (m && n)
     {
         *m = this->m;
@@ -130,7 +127,7 @@ HRESULT __stdcall Matrix::MultMatrixNum(double b)
     {
         for (int j = 0; j < n; j++)
         {
-            this->matrix[i * m + j] = this->matrix[i * m + j] * b;
+            this->matrix[i * m + j] *= b;
         }
     }
     return S_OK;
@@ -144,11 +141,8 @@ HRESULT __stdcall Matrix::DivMatrixNum(double b)
 HRESULT __stdcall Matrix::DetMatrix(double *det)
 {
     printf("Matrix::DetMatrix\n");
-    double epsilon = 0.0000000001;
-    double d = 1.0;
-    double tmp;
+    double tmp, d;
     double *temp = new double[n * n];
-
     for (int i = 0; i < n; i++)
     {
         for (int j = 0; j < n; j++)
@@ -156,24 +150,55 @@ HRESULT __stdcall Matrix::DetMatrix(double *det)
             temp[i * n + j] = matrix[i * n + j];
         }
     }
-    for (int i = 0; i < n; i++)
+    for (int k = 0; k < n - 1; k++)
     {
-        for (int j = i + 1; j < n; j++)
+        for (int i = k + 1; i < n; i++)
         {
-            while (fabs(temp[j * n + i]) > epsilon)
+            tmp = -temp[i * n + k] / temp[k * n + k];
+            for (int j = 0; j < n; j++)
             {
-                tmp = temp[i * n + i] / temp[j * n + i];
-                for (int k = 0; k < n; k++)
-                {
-                    temp[i * n + k] -= tmp * temp[j * n + k];
-                    swap(temp[i * n + k], matrix[j * n + k]);
-                }
-                d = -d;
+                temp[i * n + j] += temp[k * n + j] * tmp;
             }
         }
+    }
+    d = 1;
+    for (int i = 0; i < n; i++)
+    {
         d *= temp[i * n + i];
     }
+
+    delete[] temp;
     *det = d;
+    // double epsilon = 0.0000000001;
+    // double d = 1.0;
+    // double tmp;
+    // double *temp = new double[n * n];
+
+    // for (int i = 0; i < n; i++)
+    // {
+    //     for (int j = 0; j < n; j++)
+    //     {
+    //         temp[i * n + j] = matrix[i * n + j];
+    //     }
+    // }
+    // for (int i = 0; i < n; i++)
+    // {
+    //     for (int j = i + 1; j < n; j++)
+    //     {
+    //         while (fabs(temp[j * n + i]) > epsilon)
+    //         {
+    //             tmp = temp[i * n + i] / temp[j * n + i];
+    //             for (int k = 0; k < n; k++)
+    //             {
+    //                 temp[i * n + k] -= tmp * temp[j * n + k];
+    //                 swap(temp[i * n + k], matrix[j * n + k]);
+    //             }
+    //             d = -d;
+    //         }
+    //     }
+    //     d *= temp[i * n + i];
+    // }
+    // *det = d;
     return S_OK;
 }
 
@@ -186,12 +211,12 @@ HRESULT __stdcall Matrix::GetIDsOfNames(REFIID riid, LPOLESTR *rgszNames, UINT c
         return E_NOTIMPL;
     }
 
-    if (wcscmp(rgszNames[0], L"MultMatrixNum") == 0)
+    if (wcscmp(rgszNames[0], L"SetMatrix") == 0)
     {
         rgDispId[0] = 1;
     }
 
-    else if (wcscmp(rgszNames[0], L"DivMatrixNum") == 0)
+    else if (wcscmp(rgszNames[0], L"SetMatrixByNum") == 0)
     {
         rgDispId[0] = 2;
     }
@@ -218,11 +243,55 @@ HRESULT __stdcall Matrix::Invoke(DISPID dispIdMember, REFIID riid, LCID lcid, WO
 {
     if (dispIdMember == 1)
     {
-        printf("Matrix::Invoke::1");
+        printf("Matrix::Invoke::1::SetMatrix\n");
+
+        VARIANTARG rows = (pDispParams->rgvarg)[1];
+        VARIANTARG columns = (pDispParams->rgvarg)[0];
+        int m = rows.intVal;
+        int n = columns.intVal;
+
+        cout << (pDispParams->rgvarg)[9].intVal << endl;
+
+        matrix = new double[m * n];
+        for (int i = (pDispParams->cArgs) - 1; i > 1; i--)
+        {
+            VARIANTARG element = (pDispParams->rgvarg)[i];
+            matrix[pDispParams->cArgs - i - 1] = (double)element.intVal;
+        }
+
+        for (int i = 0; i < m; i++)
+        {
+            for (int j = 0; j < n; j++)
+            {
+                //cout << matrix[i * m + j] << endl;
+                printf("matrix[%i * %i + %i] = %.2f\n", i, m, j, matrix[i * m + j]);
+            }
+        }
+
+        return S_OK;
     }
     else if (dispIdMember == 2)
     {
-        printf("Matrix::Invoke::2");
+        printf("Matrix::Invoke::2::SetMatrixByNum\n");
+
+        VARIANTARG var = (pDispParams->rgvarg)[0];
+        VARIANTARG rows = (pDispParams->rgvarg)[2];
+        VARIANTARG columns = (pDispParams->rgvarg)[1];
+
+        int m = rows.intVal;
+        int n = columns.intVal;
+        double num = var.intVal;
+
+        printf("m = %i, n = %i, num = %f\n", m, n, num);
+
+        matrix = new double[m * n];
+
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                matrix[i * m + j] = num;
+                printf("matrix[%i * %i + %i] = %.2f\n", i, m, j, matrix[i * m + j]);
+            }
+        }
     }
     else if (dispIdMember == 3)
     {
